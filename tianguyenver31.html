@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Planning by Tia Nguyễn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --teal:#2A7B6F; --teal-light:#3a9b8d; --teal-pale:#e8f4f2;
+  --rust:#B84A2A; --rust-pale:#fdf0ec;
+  --dark:#2C2820; --mid:#7A7368; --light:#B0A89E;
+  --cream:#F5F0E8; --white:#FFFFFF;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);font-size:19px;}
+
+/* ── NAV ── */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:.85rem 2rem;background:var(--dark);position:sticky;top:0;z-index:100;}
+.nav-logo{font-family:'Caveat',cursive;font-size:1.45rem;color:var(--white);text-decoration:none;}
+.nav-right{display:flex;align-items:center;gap:.75rem;}
+.nav-email{font-size:.82rem;color:rgba(255,255,255,.5);}
+.nav-btn{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--white);padding:.32rem .85rem;border-radius:2rem;font-size:.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.nav-btn:hover{background:rgba(255,255,255,.08);}
+.nav-btn.teal{background:var(--teal);border-color:var(--teal);}
+
+/* ── PAGES ── */
+.page{display:none;min-height:calc(100vh - 52px);}
+.page.active{display:block;}
+
+/* ══════════════════════════════
+   AUTH PAGE
+══════════════════════════════ */
+.auth-wrap{max-width:600px;margin:3.5rem auto;padding:0 1.5rem;}
+.auth-card{background:var(--white);border-radius:16px;padding:2rem;border:0.5px solid rgba(44,40,32,.1);}
+.auth-headline{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--dark);margin-bottom:.25rem;}
+.auth-sub{font-size:.85rem;color:var(--mid);margin-bottom:1.4rem;}
+.field{margin-bottom:.85rem;}
+.field label{display:block;font-size:.8rem;font-weight:500;color:var(--mid);margin-bottom:.3rem;}
+.field input{width:100%;padding:.55rem .8rem;border:1px solid rgba(44,40,32,.15);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;background:var(--cream);color:var(--dark);outline:none;transition:border .2s;}
+.field input:focus{border-color:var(--teal);}
+.btn-full{width:100%;padding:.65rem;background:var(--teal);color:var(--white);border:none;border-radius:2rem;font-size:.92rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;}
+.btn-full:hover{background:var(--teal-light);}
+.auth-msg{font-size:.83rem;padding:.45rem .7rem;border-radius:6px;margin-top:.65rem;display:none;}
+.auth-msg.ok{background:#e8f5e9;color:#2e7d32;display:block;}
+.auth-msg.err{background:var(--rust-pale);color:var(--rust);display:block;}
+.forgot-link{font-size:.8rem;color:var(--teal);cursor:pointer;text-align:right;display:block;margin-top:.2rem;}
+
+/* ══════════════════════════════
+   APP LAYOUT
+══════════════════════════════ */
+.app-layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 52px);}
+@media(max-width:700px){.app-layout{grid-template-columns:1fr;}}
+
+.app-sidebar{background:var(--white);border-right:0.5px solid rgba(44,40,32,.08);padding:1.75rem 1.25rem;display:flex;flex-direction:column;}
+.sidebar-avatar{width:48px;height:48px;border-radius:50%;background:var(--teal-pale);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--teal);margin-bottom:.75rem;}
+.sidebar-name{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--dark);margin-bottom:.15rem;}
+.sidebar-username{font-size:.78rem;color:var(--mid);margin-bottom:1.25rem;}
+.sidebar-nav{display:flex;flex-direction:column;gap:.3rem;flex:1;}
+.sidebar-nav-item{display:flex;align-items:center;gap:.65rem;padding:.6rem .85rem;border-radius:10px;font-size:.9rem;color:var(--mid);cursor:pointer;transition:all .2s;border:none;background:none;font-family:'DM Sans',sans-serif;width:100%;text-align:left;}
+.sidebar-nav-item:hover{background:var(--cream);}
+.sidebar-nav-item.active{background:var(--teal-pale);color:var(--teal);font-weight:500;}
+.sidebar-nav-item .icon{font-size:1rem;width:20px;text-align:center;}
+.sidebar-footer{margin-top:auto;padding-top:1rem;border-top:0.5px solid rgba(44,40,32,.08);}
+
+.app-content{padding:2rem 2rem 3rem;overflow-y:auto;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.content-header{margin-bottom:1.5rem;}
+.content-title{font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--dark);}
+.content-sub{font-size:.85rem;color:var(--mid);margin-top:.25rem;}
+
+/* ══════════════════════════════
+   WORKSHEET LIST
+══════════════════════════════ */
+.ws-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
+@media(max-width:900px){.ws-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:560px){.ws-grid{grid-template-columns:1fr;}}
+.ws-card{background:var(--white);border-radius:14px;border:0.5px solid rgba(44,40,32,.08);padding:1.5rem;cursor:pointer;transition:transform .2s,box-shadow .2s;position:relative;}
+.ws-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(44,40,32,.1);}
+.ws-card-icon{font-size:2rem;margin-bottom:.75rem;}
+.ws-card-tag{display:inline-block;font-size:.68rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:.15rem .55rem;border-radius:2rem;background:var(--teal-pale);color:var(--teal);margin-bottom:.5rem;}
+.ws-card-title{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--dark);margin-bottom:.35rem;}
+.ws-card-desc{font-size:.82rem;color:var(--mid);line-height:1.6;}
+.ws-card-meta{display:flex;align-items:center;justify-content:space-between;margin-top:1rem;padding-top:.85rem;border-top:0.5px solid rgba(44,40,32,.08);}
+.ws-card-status{font-size:.75rem;color:var(--mid);}
+.ws-card-status.done{color:#2e7d32;}
+.ws-card-arrow{font-size:1rem;color:var(--teal);}
+.ws-empty{text-align:center;padding:3.5rem 2rem;background:var(--white);border-radius:14px;border:0.5px solid rgba(44,40,32,.08);}
+.ws-empty-icon{font-size:2.5rem;margin-bottom:.75rem;}
+.ws-empty-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--dark);margin-bottom:.4rem;}
+.ws-empty-desc{font-size:.85rem;color:var(--mid);line-height:1.65;}
+
+/* ══════════════════════════════
+   DOCS / EBOOK
+══════════════════════════════ */
+.coming-soon{background:var(--white);border-radius:14px;border:0.5px solid rgba(44,40,32,.08);padding:3rem 2rem;text-align:center;}
+.coming-soon-icon{font-size:2.5rem;margin-bottom:.75rem;}
+.coming-soon-title{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--dark);margin-bottom:.4rem;}
+.coming-soon-desc{font-size:.85rem;color:var(--mid);line-height:1.65;}
+
+/* ══════════════════════════════
+   ĐỔI MẬT KHẨU
+══════════════════════════════ */
+.pw-card{background:var(--white);border-radius:14px;border:0.5px solid rgba(44,40,32,.08);padding:1.75rem;max-width:420px;}
+
+/* ══════════════════════════════
+   WORKSHEET VIEWER (fullscreen)
+══════════════════════════════ */
+#ws-viewer{display:none;position:fixed;inset:0;z-index:200;background:var(--cream);flex-direction:column;}
+#ws-viewer.open{display:flex;}
+.ws-viewer-bar{display:flex;align-items:center;gap:.85rem;padding:.65rem 1.5rem;background:var(--dark);flex-shrink:0;}
+.ws-viewer-back{background:none;border:none;color:rgba(255,255,255,.65);font-size:.88rem;cursor:pointer;font-family:'DM Sans',sans-serif;padding:.25rem .5rem;border-radius:6px;display:flex;align-items:center;gap:.4rem;}
+.ws-viewer-back:hover{background:rgba(255,255,255,.08);}
+.ws-viewer-title{font-size:.9rem;color:rgba(255,255,255,.8);font-weight:500;}
+.ws-viewer-content{flex:1;overflow-y:auto;}
+
+/* ══════════════════════════════
+   ADMIN PAGE
+══════════════════════════════ */
+.admin-wrap{max-width:860px;margin:0 auto;padding:2rem 1.5rem 4rem;}
+.admin-page-title{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--dark);margin-bottom:1.5rem;}
+.admin-tabs{display:flex;gap:.5rem;margin-bottom:1.5rem;border-bottom:1px solid rgba(44,40,32,.1);padding-bottom:0;}
+.admin-tab-btn{background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--mid);padding:.5rem 1rem;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.admin-tab-btn.active{color:var(--teal);border-bottom-color:var(--teal);font-weight:500;}
+.admin-panel{display:none;}
+.admin-panel.active{display:block;}
+.admin-section{background:var(--white);border-radius:14px;border:0.5px solid rgba(44,40,32,.08);padding:1.25rem;margin-bottom:1.25rem;}
+.admin-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.admin-section-title{font-size:.78rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--mid);}
+.btn-sm{background:var(--teal);color:var(--white);border:none;padding:.32rem .8rem;border-radius:2rem;font-size:.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;}
+.btn-sm:hover{background:var(--teal-light);}
+.btn-sm.ghost{background:none;border:1px solid rgba(44,40,32,.18);color:var(--dark);}
+.btn-sm.ghost:hover{background:var(--cream);}
+.btn-sm.danger{background:var(--rust);}
+.admin-table{width:100%;border-collapse:collapse;font-size:.85rem;}
+.admin-table th{text-align:left;padding:.45rem .7rem;border-bottom:1px solid rgba(44,40,32,.08);font-weight:500;color:var(--mid);font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;}
+.admin-table td{padding:.6rem .7rem;border-bottom:0.5px solid rgba(44,40,32,.06);vertical-align:middle;}
+.admin-table tr:last-child td{border-bottom:none;}
+.badge{display:inline-block;font-size:.7rem;padding:.15rem .5rem;border-radius:2rem;}
+.badge.green{background:#e8f5e9;color:#2e7d32;}
+.badge.grey{background:rgba(44,40,32,.07);color:var(--mid);}
+.badge.rust{background:var(--rust-pale);color:var(--rust);}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(44,40,32,.45);z-index:300;align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--white);border-radius:16px;padding:1.75rem;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--dark);margin-bottom:1rem;}
+.modal-actions{display:flex;gap:.65rem;margin-top:1.25rem;justify-content:flex-end;}
+
+/* Misc */
+.msg{font-size:.82rem;padding:.45rem .7rem;border-radius:6px;margin-top:.65rem;display:none;}
+.msg.ok{background:#e8f5e9;color:#2e7d32;display:block;}
+.msg.err{background:var(--rust-pale);color:var(--rust);display:block;}
+.spinner-sm{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:4px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ══════════════════════════════
+   MOBILE RESPONSIVE
+══════════════════════════════ */
+@media(max-width:700px){
+  /* Base */
+  html,body{font-size:16px;}
+
+  /* Nav */
+  .nav{padding:.75rem 1rem;}
+  .nav-email{display:none;}
+
+  /* Auth */
+  .auth-wrap{margin:1.5rem auto;padding:0 1rem;}
+  .auth-card{padding:1.5rem;}
+  .auth-headline{font-size:1.35rem;}
+
+  /* App layout - ẩn sidebar, dùng bottom tab bar */
+  .app-layout{grid-template-columns:1fr;padding-bottom:64px;}
+  .app-sidebar{display:none;}
+  .app-content{padding:1.25rem 1rem 1.5rem;}
+
+  /* Bottom tab bar */
+  .mobile-tabbar{display:flex;}
+
+  /* Content */
+  .content-title{font-size:1.15rem;}
+  .ws-grid{grid-template-columns:1fr;}
+  .pw-card{max-width:100%;}
+
+  /* Admin */
+  .admin-wrap{padding:1rem 1rem 4rem;}
+  .admin-section{padding:1rem;overflow-x:auto;}
+  .admin-table{min-width:600px;}
+  .admin-section-header{flex-wrap:wrap;gap:.5rem;}
+
+  /* Worksheet viewer */
+  .ws-viewer-bar{padding:.5rem 1rem;}
+  #hm-progress{top:44px;}
+  #hm-main{padding:24px 16px 100px;}
+  #hm-result{padding:24px 16px 80px;}
+  #hm-nav{padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom));}
+}
+
+/* Bottom tab bar - chỉ hiện trên mobile */
+.mobile-tabbar{
+  display:none;
+  position:fixed;
+  bottom:0;left:0;right:0;
+  background:var(--white);
+  border-top:0.5px solid rgba(44,40,32,.1);
+  z-index:150;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.mobile-tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:.5rem .25rem;border:none;background:none;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:.65rem;color:var(--mid);gap:.2rem;
+  transition:color .2s;
+}
+.mobile-tab .tab-icon{font-size:1.3rem;line-height:1;}
+.mobile-tab.active{color:var(--teal);}
+.mobile-tab-admin{color:var(--rust)!important;}
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ NAV ═══════════════ -->
+<nav class="nav" id="main-nav">
+  <a class="nav-logo" href="#">Tia Nguyễn ✦</a>
+</nav>
+
+<!-- ═══════════════ PAGE: LOGIN ═══════════════ -->
+<div class="page active" id="page-login">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-headline">Đăng nhập</div>
+      <div class="auth-sub">Dùng tài khoản được cấp để truy cập nội dung của bạn.</div>
+      <div class="field">
+        <label>Tên đăng nhập</label>
+        <input type="text" id="login-username" placeholder="username" autocomplete="username">
+      </div>
+      <div class="field">
+        <label>Mật khẩu</label>
+        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+        <span class="forgot-link" onclick="showForgot()">Quên mật khẩu?</span>
+      </div>
+      <div class="auth-msg" id="login-msg"></div>
+      <button class="btn-full" onclick="doLogin()">Đăng nhập</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PAGE: APP ═══════════════ -->
+<div class="page" id="page-app">
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="app-sidebar">
+      <div class="sidebar-avatar" id="sidebar-avatar">T</div>
+      <div class="sidebar-name" id="sidebar-name">Thành viên</div>
+      <div class="sidebar-username" id="sidebar-username">@username</div>
+      <nav class="sidebar-nav">
+        <button class="sidebar-nav-item active" onclick="switchTab('worksheet')" id="nav-worksheet">
+          <span class="icon">📋</span> Worksheet
+        </button>
+        <button class="sidebar-nav-item" onclick="switchTab('docs')" id="nav-docs">
+          <span class="icon">📚</span> Tài liệu & Ebook
+        </button>
+        <button class="sidebar-nav-item" onclick="switchTab('password')" id="nav-password">
+          <span class="icon">🔑</span> Đổi mật khẩu
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="sidebar-nav-item" id="btn-back-admin" onclick="switchToAdminView()" style="display:none;color:var(--teal);">
+          <span class="icon">⚙️</span> Về Admin Panel
+        </button>
+        <button class="sidebar-nav-item" onclick="doLogout()" style="color:var(--rust);">
+          <span class="icon">↩</span> Đăng xuất
+        </button>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <main class="app-content">
+      <!-- Worksheet tab -->
+      <div class="tab-panel active" id="tab-worksheet">
+        <div class="content-header">
+          <div class="content-title">Worksheet của bạn</div>
+          <div class="content-sub">Các worksheet bạn đã mua. Bấm vào để bắt đầu làm.</div>
+        </div>
+        <div class="ws-grid" id="ws-grid"></div>
+      </div>
+
+      <!-- Docs tab -->
+      <div class="tab-panel" id="tab-docs">
+        <div class="content-header">
+          <div class="content-title">Tài liệu & Ebook</div>
+          <div class="content-sub">Tài nguyên học tập dành cho thành viên.</div>
+        </div>
+        <div class="coming-soon">
+          <div class="coming-soon-icon">📖</div>
+          <div class="coming-soon-title">Đang cập nhật</div>
+          <div class="coming-soon-desc">Tài liệu và ebook sẽ sớm có mặt tại đây.<br>Theo dõi email để nhận thông báo nhé!</div>
+        </div>
+      </div>
+
+      <!-- Password tab -->
+      <div class="tab-panel" id="tab-password">
+        <div class="content-header">
+          <div class="content-title">Đổi mật khẩu</div>
+          <div class="content-sub">Cập nhật mật khẩu đăng nhập của bạn.</div>
+        </div>
+        <div class="pw-card">
+          <div class="field">
+            <label>Mật khẩu hiện tại</label>
+            <input type="password" id="pw-current" placeholder="••••••••">
+          </div>
+          <div class="field">
+            <label>Mật khẩu mới</label>
+            <input type="password" id="pw-new" placeholder="Tối thiểu 8 ký tự">
+          </div>
+          <div class="field">
+            <label>Xác nhận mật khẩu mới</label>
+            <input type="password" id="pw-confirm" placeholder="Nhập lại mật khẩu mới">
+          </div>
+          <div class="msg" id="pw-msg"></div>
+          <button class="btn-full" onclick="doChangePassword()">Cập nhật mật khẩu</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ═══════════════ PAGE: ADMIN ═══════════════ -->
+<div class="page" id="page-admin">
+  <div class="admin-wrap">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+      <div class="admin-page-title" style="margin-bottom:0;">Admin Panel</div>
+      <div style="display:flex;gap:.65rem;">
+        <button class="btn-sm ghost" onclick="switchToUserView()">👤 Xem trang thành viên</button>
+        <button class="btn-sm ghost" onclick="doLogout()">↩ Đăng xuất</button>
+      </div>
+    </div>
+    <div class="admin-tabs">
+      <button class="admin-tab-btn active" onclick="switchAdminTab('users')">Thành viên</button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('worksheets')">Worksheet</button>
+    </div>
+
+    <!-- Users panel -->
+    <div class="admin-panel active" id="admin-panel-users">
+      <div class="admin-section">
+        <div class="admin-section-header">
+          <span class="admin-section-title">Danh sách thành viên</span>
+          <button class="btn-sm" onclick="openCreateUserModal()">+ Tạo thành viên</button>
+        </div>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Tên</th>
+              <th>Email</th>
+              <th>Worksheet</th>
+              <th>Trạng thái</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody">
+            <tr><td colspan="6" style="text-align:center;color:var(--light);padding:1.5rem;">Đang tải...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Worksheets panel -->
+    <div class="admin-panel" id="admin-panel-worksheets">
+      <div class="admin-section">
+        <div class="admin-section-header">
+          <span class="admin-section-title">Danh sách worksheet</span>
+        </div>
+        <table class="admin-table">
+          <thead>
+            <tr><th>ID</th><th>Tên worksheet</th><th>Số thành viên có access</th></tr>
+          </thead>
+          <tbody id="ws-admin-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ WORKSHEET VIEWER ═══════════════ -->
+<div id="ws-viewer">
+  <div class="ws-viewer-bar">
+    <button class="ws-viewer-back" onclick="closeViewer()">← Quay lại</button>
+    <span class="ws-viewer-title" id="ws-viewer-title"></span>
+  </div>
+  <div class="ws-viewer-content" id="ws-viewer-content">
+
+    <!-- ══ WORKSHEET: HIỂU MÌNH ══ -->
+    <div id="hm-wrapper" style="display:none;">
+      <style>
+      @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+      #hm-wrapper{font-family:'Be Vietnam Pro',sans-serif;font-size:19px;line-height:1.65;color:#1A1A2E;background:#F7F5F2;min-height:100%;}
+      #hm-wrapper *{box-sizing:border-box;}
+      #hm-wrapper{--hm-bg:#F7F5F2;--hm-surface:#fff;--hm-ink:#1A1A2E;--hm-ink-light:#5A5A72;--hm-ink-faint:#9898A8;--hm-accent:#3D6B8E;--hm-accent-light:#EAF1F7;--hm-accent-mid:#C2D8EA;--hm-a:#2A6049;--hm-a-light:#E8F4F0;--hm-b:#6B3D6B;--hm-b-light:#F4EAF4;--hm-border:#E2DDD8;--hm-warn:#C0681A;--hm-warn-light:#FEF3E8;--hm-radius:12px;--hm-radius-sm:8px;}
+      #hm-progress{background:#fff;border-bottom:1px solid var(--hm-border);padding:12px 24px;position:sticky;top:52px;z-index:99;}
+      #hm-progress-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+      #hm-progress-label{font-size:13px;font-weight:600;color:var(--hm-ink);}
+      #hm-progress-pct{font-size:12px;color:var(--hm-ink-faint);}
+      #hm-progress-bar{height:4px;background:var(--hm-border);border-radius:2px;overflow:hidden;}
+      #hm-progress-fill{height:100%;background:var(--hm-accent);border-radius:2px;transition:width .4s ease;}
+      #hm-main{max-width:750px;margin:0 auto;padding:40px 24px 120px;}
+      #hm-wrapper .hm-qcard{background:#fff;border-radius:var(--hm-radius);border:1px solid var(--hm-border);padding:32px;display:none;}
+      #hm-wrapper .hm-qcard.active{display:block;}
+      #hm-wrapper .hm-section-tag{font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--hm-ink-faint);text-transform:uppercase;margin-bottom:8px;}
+      #hm-wrapper .hm-qnum{font-size:28px;font-weight:700;color:var(--hm-accent);line-height:1;margin-bottom:4px;}
+      #hm-wrapper .hm-qtext{font-size:20px;font-weight:600;color:var(--hm-ink);line-height:1.35;margin-bottom:28px;}
+      #hm-wrapper .hm-choices{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px;}
+      @media(max-width:520px){#hm-wrapper .hm-choices{grid-template-columns:1fr;}}
+      #hm-wrapper .hm-choice{border:2px solid var(--hm-border);border-radius:var(--hm-radius-sm);padding:16px;cursor:pointer;background:#fff;text-align:left;transition:all .18s;}
+      #hm-wrapper .hm-choice:hover{border-color:var(--hm-accent-mid);background:var(--hm-accent-light);}
+      #hm-wrapper .hm-choice-letter{font-size:11px;font-weight:700;letter-spacing:.06em;margin-bottom:4px;}
+      #hm-wrapper .hm-choice[data-ch="A"] .hm-choice-letter{color:var(--hm-a);}
+      #hm-wrapper .hm-choice[data-ch="B"] .hm-choice-letter{color:var(--hm-b);}
+      #hm-wrapper .hm-choice-main{font-size:14px;font-weight:600;color:var(--hm-ink);margin-bottom:3px;line-height:1.3;}
+      #hm-wrapper .hm-choice-sub{font-size:12px;color:var(--hm-ink-light);line-height:1.4;}
+      #hm-wrapper .hm-choice.sel-A{border-color:var(--hm-a);background:var(--hm-a-light);}
+      #hm-wrapper .hm-choice.sel-B{border-color:var(--hm-b);background:var(--hm-b-light);}
+      #hm-wrapper .hm-choice.sel-A .hm-choice-main,#hm-wrapper .hm-choice.sel-A .hm-choice-sub{color:var(--hm-a);}
+      #hm-wrapper .hm-choice.sel-B .hm-choice-main,#hm-wrapper .hm-choice.sel-B .hm-choice-sub{color:var(--hm-b);}
+      #hm-wrapper .hm-verify{border-top:1px solid var(--hm-border);padding-top:24px;}
+      #hm-wrapper .hm-verify-label{font-size:13px;font-weight:600;color:var(--hm-ink);margin-bottom:4px;}
+      #hm-wrapper .hm-verify-hint{font-size:12px;color:var(--hm-ink-faint);margin-bottom:16px;}
+      #hm-wrapper .hm-verify-item{margin-bottom:12px;}
+      #hm-wrapper .hm-verify-q{font-size:13px;color:var(--hm-ink-light);margin-bottom:6px;font-style:italic;}
+      #hm-wrapper .hm-verify-input{width:100%;border:1px solid var(--hm-border);border-radius:var(--hm-radius-sm);padding:10px 12px;font-family:inherit;font-size:13px;color:var(--hm-ink);background:var(--hm-bg);resize:none;min-height:60px;transition:border-color .15s;line-height:1.5;}
+      #hm-wrapper .hm-verify-input:focus{outline:none;border-color:var(--hm-accent);background:#fff;}
+      #hm-wrapper .hm-verify-input.filled{border-color:var(--hm-accent-mid);background:var(--hm-accent-light);}
+      #hm-nav{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--hm-border);padding:16px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px;z-index:100;}
+      #hm-wrapper .hm-btn{border:none;border-radius:var(--hm-radius-sm);padding:12px 24px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all .18s;}
+      #hm-wrapper .hm-btn-ghost{background:transparent;color:var(--hm-ink-light);border:1px solid var(--hm-border);}
+      #hm-wrapper .hm-btn-ghost:hover{background:var(--hm-bg);}
+      #hm-wrapper .hm-btn-primary{background:var(--hm-accent);color:#fff;min-width:120px;}
+      #hm-wrapper .hm-btn-primary:hover{background:#335C7A;}
+      #hm-incomplete-modal{display:none;position:fixed;inset:0;background:rgba(26,26,46,.45);z-index:300;align-items:center;justify-content:center;padding:24px;}
+      #hm-incomplete-modal.show{display:flex;}
+      #hm-wrapper .hm-modal-box{background:#fff;border-radius:var(--hm-radius);padding:28px;max-width:480px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.12);}
+      #hm-wrapper .hm-modal-title{font-size:16px;font-weight:700;color:var(--hm-ink);margin-bottom:6px;}
+      #hm-wrapper .hm-modal-sub{font-size:13px;color:var(--hm-ink-light);margin-bottom:20px;line-height:1.5;}
+      #hm-wrapper .hm-incomplete-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+      #hm-wrapper .hm-incomplete-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--hm-radius-sm);border:1px solid var(--hm-border);cursor:pointer;transition:all .15s;background:var(--hm-bg);}
+      #hm-wrapper .hm-incomplete-item:hover{border-color:var(--hm-accent);background:var(--hm-accent-light);}
+      #hm-wrapper .hm-incomplete-num{font-size:12px;font-weight:700;color:var(--hm-accent);min-width:48px;}
+      #hm-wrapper .hm-incomplete-q{font-size:13px;color:var(--hm-ink);line-height:1.4;flex:1;}
+      #hm-wrapper .hm-incomplete-status{font-size:11px;color:var(--hm-warn);white-space:nowrap;}
+      #hm-wrapper .hm-modal-close{width:100%;padding:11px;border-radius:var(--hm-radius-sm);border:1px solid var(--hm-border);background:transparent;font-family:inherit;font-size:13px;color:var(--hm-ink-light);cursor:pointer;}
+      #hm-result{display:none;max-width:750px;margin:0 auto;padding:40px 24px 80px;}
+      #hm-wrapper .hm-result-header{text-align:center;margin-bottom:40px;}
+      #hm-wrapper .hm-result-header h1{font-size:26px;font-weight:700;color:var(--hm-ink);margin-bottom:8px;}
+      #hm-wrapper .hm-result-header p{font-size:14px;color:var(--hm-ink-light);}
+      #hm-wrapper .hm-result-card{background:#fff;border-radius:var(--hm-radius);border:1px solid var(--hm-border);padding:32px;margin-bottom:20px;}
+      #hm-wrapper .hm-result-card h2{font-size:16px;font-weight:700;color:var(--hm-accent);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--hm-border);}
+      #hm-wrapper .hm-ai-loading{text-align:center;padding:40px 20px;}
+      #hm-wrapper .hm-spinner{width:36px;height:36px;border:3px solid var(--hm-border);border-top-color:var(--hm-accent);border-radius:50%;animation:hm-spin .8s linear infinite;margin:0 auto 16px;}
+      @keyframes hm-spin{to{transform:rotate(360deg);}}
+      #hm-wrapper .hm-ai-result{font-size:14px;line-height:1.75;color:var(--hm-ink);}
+      #hm-wrapper .hm-ai-result h3{font-size:19px;font-weight:700;color:var(--hm-ink);margin:20px 0 8px;}
+      #hm-wrapper .hm-ai-result p{margin-bottom:10px;}
+      #hm-wrapper .hm-ai-result ul{padding-left:20px;margin-bottom:10px;}
+      #hm-wrapper .hm-ai-result li{margin-bottom:4px;}
+      #hm-wrapper .hm-ai-error{background:var(--hm-warn-light);border:1px solid #F0C090;border-radius:var(--hm-radius-sm);padding:16px;font-size:13px;color:var(--hm-warn);}
+      #hm-wrapper .hm-answers{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;}
+      #hm-wrapper .hm-chip{border-radius:6px;padding:8px 12px;font-size:12px;}
+      #hm-wrapper .hm-chip .hm-chip-q{color:var(--hm-ink-faint);margin-bottom:2px;font-size:11px;}
+      #hm-wrapper .hm-chip .hm-chip-a{font-weight:600;font-size:12px;}
+      #hm-wrapper .hm-chip.ch-A{background:var(--hm-a-light);}
+      #hm-wrapper .hm-chip.ch-A .hm-chip-a{color:var(--hm-a);}
+      #hm-wrapper .hm-chip.ch-B{background:var(--hm-b-light);}
+      #hm-wrapper .hm-chip.ch-B .hm-chip-a{color:var(--hm-b);}
+      #hm-wrapper .hm-redo{display:block;margin:24px auto 0;background:transparent;border:1px solid var(--hm-border);border-radius:var(--hm-radius-sm);padding:10px 24px;font-family:inherit;font-size:13px;color:var(--hm-ink-light);cursor:pointer;}
+      </style>
+
+      <!-- Trang hướng dẫn -->
+      <div id="hm-guide" style="display:none;max-width:750px;margin:0 auto;padding:40px 24px;">
+        <div style="background:#fff;border-radius:var(--hm-radius);border:1px solid var(--hm-border);padding:40px;">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--hm-ink-faint);text-transform:uppercase;margin-bottom:12px;">Trước khi bắt đầu</div>
+          <h2 style="font-family:'Be Vietnam Pro',sans-serif;font-size:22px;font-weight:700;color:var(--hm-ink);margin-bottom:24px;">Hướng dẫn sử dụng worksheet</h2>
+          <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:36px;">
+            <div style="display:flex;align-items:flex-start;gap:14px;">
+              <span style="background:var(--hm-accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:2px;">1</span>
+              <p style="font-size:15px;color:var(--hm-ink);line-height:1.65;margin:0;">Chọn đáp án cho từng câu hỏi.</p>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:14px;">
+              <span style="background:var(--hm-accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:2px;">2</span>
+              <p style="font-size:15px;color:var(--hm-ink);line-height:1.65;margin:0;">Nếu gặp câu hỏi chưa chắc chắn về đáp án, bạn có thể bỏ qua và quay lại làm trước khi "xem kết quả".</p>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:14px;">
+              <span style="background:var(--hm-accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:2px;">3</span>
+              <p style="font-size:15px;color:var(--hm-ink);line-height:1.65;margin:0;">Cố gắng trả lời các câu hỏi xác minh để xác thực đáp án bạn chọn. Bạn càng trả lời các câu hỏi xác minh, thì bản phân tích tổng hợp càng chính xác và đầy đủ.</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;">
+            <button onclick="hmStartFromGuide()" style="flex:1;background:var(--hm-accent);color:#fff;border:none;padding:14px;border-radius:var(--hm-radius-sm);font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;">Đã hiểu, bắt đầu làm →</button>
+            <button onclick="closeViewer()" style="background:transparent;color:var(--hm-ink-light);border:1px solid var(--hm-border);padding:14px 20px;border-radius:var(--hm-radius-sm);font-family:inherit;font-size:15px;cursor:pointer;">Thoát</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="hm-progress">
+        <div id="hm-progress-info">
+          <span id="hm-progress-label">Câu 1 / 30</span>
+          <span id="hm-progress-pct">0%</span>
+        </div>
+        <div id="hm-progress-bar"><div id="hm-progress-fill" style="width:0%"></div></div>
+      </div>
+
+      <main id="hm-main"></main>
+
+      <div id="hm-result">
+        <div class="hm-result-header">
+          <h1>Kết quả của bạn</h1>
+          <p>Dựa trên 30 câu trả lời và ví dụ xác minh, đây là bản tổng hợp profile của bạn.</p>
+        </div>
+        <div class="hm-result-card">
+          <h2 style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="hmToggleSummary()">
+            Tóm tắt 30 lựa chọn
+            <span id="hm-summary-toggle" style="font-size:13px;font-weight:400;color:var(--hm-ink-light);">Thu gọn ▲</span>
+          </h2>
+          <div class="hm-answers" id="hm-answers"></div>
+        </div>
+        <div class="hm-result-card">
+          <h2>AI hỗ trợ tổng hợp và gợi ý</h2>
+          <div class="hm-ai-loading" id="hm-ai-loading"><div class="hm-spinner"></div><p>Đang phân tích...</p></div>
+          <div class="hm-ai-result" id="hm-ai-content" style="display:none"></div>
+          <div class="hm-ai-error" id="hm-ai-error" style="display:none"></div>
+        </div>
+        <button class="hm-redo" onclick="hmReset()">Làm lại từ đầu</button>
+      </div>
+
+      <div id="hm-incomplete-modal" onclick="hmCloseModalOutside(event)">
+        <div class="hm-modal-box">
+          <div class="hm-modal-title">Còn một số câu chưa hoàn thành</div>
+          <div class="hm-modal-sub">Bấm vào từng câu để quay lại điền.</div>
+          <div class="hm-incomplete-list" id="hm-incomplete-list"></div>
+          <button class="hm-modal-close" onclick="hmCloseModal()">Đóng</button>
+        </div>
+      </div>
+
+      <div id="hm-nav">
+        <button class="hm-btn hm-btn-ghost" id="hm-btn-back" onclick="hmGoBack()">← Quay lại</button>
+        <button class="hm-btn hm-btn-primary" id="hm-btn-next" onclick="hmGoNext()">Tiếp theo →</button>
+      </div>
+
+    </div><!-- /#hm-wrapper -->
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: TẠO USER ═══════════════ -->
+<div class="modal-overlay" id="modal-create-user" onclick="closeModalOutside(event,'modal-create-user')">
+  <div class="modal-box">
+    <div class="modal-title">Tạo thành viên mới</div>
+    <div class="field">
+      <label>Tên hiển thị</label>
+      <input type="text" id="new-display-name" placeholder="Nguyễn Văn A">
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="new-email" placeholder="email@example.com">
+    </div>
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="new-username" placeholder="nguyenvana">
+    </div>
+    <div style="background:var(--teal-pale);border-radius:8px;padding:.65rem .85rem;font-size:.82rem;color:var(--teal);margin-bottom:.85rem;">
+      🔑 Mật khẩu tạm sẽ được tự động tạo và gửi vào email của thành viên.
+    </div>
+    <div class="field">
+      <label>Worksheet được cấp</label>
+      <div id="ws-checkboxes" style="display:flex;flex-direction:column;gap:.5rem;margin-top:.25rem;"></div>
+    </div>
+    <div class="msg" id="create-user-msg"></div>
+    <div class="modal-actions">
+      <button class="btn-sm ghost" onclick="closeModal('modal-create-user')">Huỷ</button>
+      <button class="btn-sm" onclick="doCreateUser()">Tạo thành viên</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: ASSIGN WORKSHEET ═══════════════ -->
+<div class="modal-overlay" id="modal-assign-ws" onclick="closeModalOutside(event,'modal-assign-ws')">
+  <div class="modal-box">
+    <div class="modal-title">Chỉnh worksheet cho <span id="assign-username-label"></span></div>
+    <input type="hidden" id="assign-uid">
+    <div id="assign-ws-checkboxes" style="display:flex;flex-direction:column;gap:.5rem;"></div>
+    <div class="msg" id="assign-msg"></div>
+    <div class="modal-actions">
+      <button class="btn-sm ghost" onclick="closeModal('modal-assign-ws')">Huỷ</button>
+      <button class="btn-sm" onclick="doAssignWorksheet()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MOBILE TAB BAR ═══════════════ -->
+<div class="mobile-tabbar" id="mobile-tabbar">
+  <button class="mobile-tab active" id="mob-tab-worksheet" onclick="switchTab('worksheet');setMobileTab('worksheet')">
+    <span class="tab-icon">📋</span>Worksheet
+  </button>
+  <button class="mobile-tab" id="mob-tab-docs" onclick="switchTab('docs');setMobileTab('docs')">
+    <span class="tab-icon">📚</span>Tài liệu
+  </button>
+  <button class="mobile-tab" id="mob-tab-password" onclick="switchTab('password');setMobileTab('password')">
+    <span class="tab-icon">🔑</span>Đổi mật khẩu
+  </button>
+  <button class="mobile-tab" id="mob-tab-logout" onclick="doLogout()" style="color:var(--rust);">
+    <span class="tab-icon">↩</span>Đăng xuất
+  </button>
+</div>
+
+<!-- ═══════════════ MODAL: LIÊN HỆ MUA ═══════════════ -->
+<div class="modal-overlay" id="modal-buy" onclick="closeModalOutside(event,'modal-buy')">
+  <div class="modal-box" style="max-width:360px;text-align:center;">
+    <div style="font-size:2rem;margin-bottom:.75rem;">🛒</div>
+    <div class="modal-title" style="text-align:center;">Mua worksheet</div>
+    <p style="font-size:.88rem;color:var(--mid);line-height:1.65;margin-bottom:1.25rem;">
+      Vui lòng liên hệ Zalo <strong>0362 864 028</strong> để mua nhanh.
+    </p>
+    <a href="https://zalo.me/0362864028" target="_blank"
+      style="display:inline-flex;align-items:center;gap:.5rem;background:var(--teal);color:#fff;padding:.55rem 1.25rem;border-radius:2rem;font-size:.88rem;font-weight:500;text-decoration:none;margin-bottom:.75rem;">
+      Nhắn Zalo ngay
+    </a>
+    <div>
+      <button class="btn-sm ghost" onclick="closeModal('modal-buy')" style="margin-top:.25rem;">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: QUÊN MẬT KHẨU ═══════════════ -->
+<div class="modal-overlay" id="modal-forgot" onclick="closeModalOutside(event,'modal-forgot')">
+  <div class="modal-box" style="max-width:380px;">
+    <div class="modal-title">Quên mật khẩu</div>
+    <p style="font-size:.85rem;color:var(--mid);line-height:1.65;margin-bottom:1rem;">
+      Nhập email bạn đã đăng ký. Mình sẽ gửi link đặt lại mật khẩu vào email đó.
+    </p>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="forgot-email" placeholder="email@example.com">
+    </div>
+    <div class="msg" id="forgot-msg"></div>
+    <div class="modal-actions">
+      <button class="btn-sm ghost" onclick="closeModal('modal-forgot')">Đóng</button>
+      <button class="btn-sm" onclick="doForgotPassword()">Gửi link đặt lại</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: RESET PASSWORD ═══════════════ -->
+<div class="modal-overlay" id="modal-reset-pw" onclick="closeModalOutside(event,'modal-reset-pw')">
+  <div class="modal-box">
+    <div class="modal-title">Reset mật khẩu</div>
+    <p style="font-size:.85rem;color:var(--mid);margin-bottom:1rem;">Đặt mật khẩu mới cho <strong id="reset-pw-username"></strong></p>
+    <input type="hidden" id="reset-pw-uid">
+    <div class="field">
+      <label>Mật khẩu mới</label>
+      <input type="text" id="reset-pw-value" placeholder="Tối thiểu 8 ký tự">
+    </div>
+    <div class="msg" id="reset-pw-msg"></div>
+    <div class="modal-actions">
+      <button class="btn-sm ghost" onclick="closeModal('modal-reset-pw')">Huỷ</button>
+      <button class="btn-sm" onclick="doResetPassword()">Cập nhật</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, reauthenticateWithCredential, EmailAuthProvider, sendPasswordResetEmail }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, collection, query, where, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+// ── CONFIG - ĐIỀN FIREBASE CONFIG CỦA BẠN VÀO ĐÂY ──────
+const firebaseConfig = {
+  apiKey: "PASTE_API_KEY",
+  authDomain: "PASTE_AUTH_DOMAIN",
+  projectId: "PASTE_PROJECT_ID",
+  storageBucket: "PASTE_STORAGE_BUCKET",
+  messagingSenderId: "PASTE_SENDER_ID",
+  appId: "PASTE_APP_ID"
+};
+
+// Danh sách worksheet có trong hệ thống
+const WORKSHEETS = [
+  {
+    id: 'hieu-minh',
+    name: 'Hiểu Mình',
+    icon: '🪞',
+    desc: 'Thay vì hỏi "mình thích gì" hay "mình hợp nghề gì", 30 câu hỏi của bộ worksheet "Hiểu mình" giúp bạn hiểu rõ hơn về cách bạn vận hành trong công việc, để từ đó đưa ra lựa chọn phù hợp hơn, thay vì cứ chọn theo xu hướng hay theo lời khuyên của người khác.',
+    audience: [
+      'Bạn sắp ra trường và chưa biết muốn làm ngành gì',
+      'Bạn đang đi làm nhưng cảm thấy công việc hiện tại không phù hợp',
+      'Bạn đang cân nhắc chuyển ngành hoặc chuyển công ty',
+      'Bạn đang kiệt sức và muốn tìm công việc mới thực sự phù hợp',
+      'Bạn muốn hiểu rõ bản thân hơn trước khi đưa ra quyết định lớn',
+    ],
+    outcomes: [
+      'Hiểu rõ cách bạn vận hành và điều kiện để bạn làm việc tốt nhất',
+      'Biết mình thực sự coi trọng điều gì trong công việc',
+      'Có gợi ý cụ thể về môi trường, loại tổ chức và hướng đi phù hợp',
+      'Biết những loại môi trường nào cần tránh và lý do tại sao',
+      'Có câu mô tả bản thân để dùng trong phỏng vấn hoặc khi nói chuyện với mentor',
+    ]
+  },
+  {
+    id: 'tktksn',
+    name: 'Xây dựng tài khoản tiết kiệm sự nghiệp',
+    icon: '🏦',
+    desc: 'Worksheet này giúp bạn thu thập dữ liệu thực tế về bản thân, đối chiếu với thị trường, tìm ra điểm gap với những vị trí đang được tuyển dụng trên thị trường và tự xây dựng lộ trình riêng của mình.',
+    audience: [
+      'Sinh viên đang mông lung về định hướng, chưa có đủ trải nghiệm thực tế để biết mình hợp với điều gì',
+      'Người đã đi làm nhưng kỹ năng chưa kết nối thành lợi thế rõ ràng - làm nhiều, bận liên tục nhưng không thấy mình tiến lên',
+      'Người muốn chuyển ngành hoặc chuyển hình thức làm việc nhưng chưa rõ mình có thực sự phù hợp với hướng mới không',
+    ],
+    outcomes: [
+      'Biết tài khoản tiết kiệm sự nghiệp của mình đang có những gì',
+      'Nhìn rõ gap giữa bản thân và những vị trí đang được tuyển dụng trên thị trường',
+      'Có lộ trình cụ thể để lấp gap và xây dựng lợi thế cạnh tranh riêng',
+    ],
+    comingSoon: true
+  },
+  // Thêm worksheet mới vào đây
+];
+
+const ADMIN_USERNAME = 'admin'; // username của tài khoản admin
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ── STATE ───────────────────────────────────────────────
+let currentUser = null;
+let currentUserData = null;
+
+// ── AUTH STATE ──────────────────────────────────────────
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    currentUser = user;
+    const snap = await getDoc(doc(db, 'users_v3', user.uid));
+    if (snap.exists()) {
+      currentUserData = snap.data();
+      // Kiểm tra tài khoản có bị tạm dừng không
+      if (currentUserData.active === false) {
+        await signOut(auth);
+        const msg = document.getElementById('login-msg');
+        showMsg(msg, 'err', 'Tài khoản của bạn đã bị tạm dừng. Vui lòng liên hệ Zalo 0362 864 028 để được hỗ trợ.');
+        return;
+      }
+      renderApp();
+    } else {
+      await signOut(auth);
+      showPage('login');
+    }
+  } else {
+    currentUser = null;
+    currentUserData = null;
+    showPage('login');
+  }
+});
+
+// ── LOGIN ───────────────────────────────────────────────
+window.doLogin = async function() {
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value;
+  const msg = document.getElementById('login-msg');
+  msg.className = 'auth-msg';
+  msg.style.display = 'none';
+
+  if (!username || !password) {
+    showMsg(msg, 'err', 'Vui lòng điền đầy đủ thông tin.');
+    return;
+  }
+
+  try {
+    // Lookup email từ username
+    const q = query(collection(db, 'users_v3'), where('username', '==', username));
+    const snap = await getDocs(q);
+    if (snap.empty) {
+      showMsg(msg, 'err', 'Tên đăng nhập không tồn tại.');
+      return;
+    }
+    const email = snap.docs[0].data().email;
+    await signInWithEmailAndPassword(auth, email, password);
+    // onAuthStateChanged sẽ xử lý tiếp
+  } catch(e) {
+    console.log('Login error:', e.code, e.message);
+    const errMap = {
+      'auth/wrong-password': 'Mật khẩu không đúng.',
+      'auth/invalid-credential': 'Tên đăng nhập hoặc mật khẩu không đúng.',
+      'auth/too-many-requests': 'Quá nhiều lần thử. Vui lòng thử lại sau.',
+    };
+    showMsg(msg, 'err', errMap[e.code] || 'Lỗi: ' + e.code + ' - ' + e.message);
+  }
+};
+
+window.doLogout = async function() {
+  await signOut(auth);
+};
+
+// ── RENDER APP ──────────────────────────────────────────
+function renderApp(forceUserView = false) {
+  const d = currentUserData;
+  const isAdmin = d.username === ADMIN_USERNAME;
+
+  document.getElementById('sidebar-avatar').textContent = (d.displayName || d.username)[0].toUpperCase();
+  document.getElementById('sidebar-name').textContent = d.displayName || d.username;
+  document.getElementById('sidebar-username').textContent = '@' + d.username;
+
+  // Hiện nút "Về Admin Panel" nếu là admin đang xem trang user
+  const btnBackAdmin = document.getElementById('btn-back-admin');
+  if (btnBackAdmin) btnBackAdmin.style.display = isAdmin ? 'flex' : 'none';
+
+  renderWorksheetGrid(d.worksheets || []);
+
+  if (isAdmin && !forceUserView) {
+    showPage('admin');
+    loadAdminData();
+  } else {
+    showPage('app');
+  }
+}
+
+function renderWorksheetGrid(assignedIds) {
+  const grid = document.getElementById('ws-grid');
+  if (!assignedIds.length) {
+    grid.innerHTML = `
+      <div class="ws-empty">
+        <div class="ws-empty-icon">📋</div>
+        <div class="ws-empty-title">Chưa có worksheet nào</div>
+        <div class="ws-empty-desc">Liên hệ Tia Nguyễn để được cấp quyền truy cập worksheet.</div>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = WORKSHEETS.map(ws => {
+    const owned = assignedIds.includes(ws.id);
+    const answers = JSON.parse(localStorage.getItem('hm_answers') || '{}');
+    const aiResult = localStorage.getItem('hm_ai_result');
+    const answeredCount = Object.keys(answers).filter(k => answers[k]?.choice).length;
+    const total = 30;
+
+    let statusLabel = '', statusColor = '', statusBg = '';
+    let btnLabel = '', btnAction = '';
+    let progressPct = 0;
+
+    if (ws.comingSoon) {
+      statusLabel = 'Đặt trước';
+      statusColor = '#B07D2A';
+      statusBg = '#FEF3E8';
+      btnLabel = 'Đặt trước →';
+      btnAction = `window.showBuyModal()`;
+    } else if (!owned) {
+      statusLabel = 'Liên hệ mua';
+      statusColor = 'var(--rust)';
+      statusBg = 'var(--rust-pale)';
+      btnLabel = 'Liên hệ mua →';
+      btnAction = `window.showBuyModal()`;
+    } else if (aiResult) {
+      statusLabel = 'Đã hoàn thành';
+      statusColor = '#2e7d32';
+      statusBg = '#e8f5e9';
+      btnLabel = 'Xem kết quả →';
+      btnAction = `openWorksheetResult('${ws.id}','${ws.name}')`;
+      progressPct = 100;
+    } else if (answeredCount > 0) {
+      statusLabel = `Đang làm - ${answeredCount}/${total} câu`;
+      statusColor = 'var(--teal)';
+      statusBg = 'var(--teal-pale)';
+      btnLabel = 'Làm tiếp →';
+      btnAction = `openWorksheet('${ws.id}','${ws.name}')`;
+      progressPct = Math.round((answeredCount / total) * 100);
+    } else {
+      statusLabel = 'Chưa bắt đầu';
+      statusColor = 'var(--light)';
+      statusBg = 'rgba(44,40,32,.07)';
+      btnLabel = 'Bắt đầu làm →';
+      btnAction = `openWorksheet('${ws.id}','${ws.name}')`;
+    }
+
+    const progressBar = progressPct > 0 ? `
+      <div style="height:3px;background:rgba(44,40,32,.08);border-radius:2px;margin:.65rem 0;">
+        <div style="height:3px;background:${progressPct===100?'#2e7d32':'var(--teal)'};border-radius:2px;width:${progressPct}%;transition:width .4s;"></div>
+      </div>` : '';
+
+    return `
+      <div class="ws-card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.75rem;">
+          <div style="display:flex;align-items:center;gap:.65rem;">
+            <span style="font-size:1.6rem;">${ws.icon}</span>
+            <div>
+              <div class="ws-card-tag">Worksheet</div>
+              <div class="ws-card-title" style="margin-bottom:0;">${ws.name}</div>
+            </div>
+          </div>
+          <span style="font-size:.72rem;padding:.2rem .6rem;border-radius:2rem;background:${statusBg};color:${statusColor};font-weight:500;white-space:nowrap;flex-shrink:0;margin-left:.5rem;">${statusLabel}</span>
+        </div>
+
+        <div class="ws-card-desc" style="-webkit-line-clamp:3;">${ws.desc}</div>
+
+        <div style="margin-top:.85rem;padding-top:.85rem;border-top:0.5px solid rgba(44,40,32,.08);">
+          <div style="font-size:.75rem;font-weight:600;color:var(--mid);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.04em;">Dành cho bạn nếu</div>
+          <ul style="padding-left:1rem;margin:0;">
+            ${ws.audience.map(a => `<li style="font-size:.78rem;color:var(--mid);line-height:1.55;margin-bottom:.2rem;">${a}</li>`).join('')}
+          </ul>
+        </div>
+
+          <div style="margin-top:.85rem;">
+          <div style="font-size:.75rem;font-weight:600;color:var(--mid);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.04em;">Làm xong được gì?</div>
+          <div style="display:flex;flex-direction:column;gap:.35rem;">
+            ${ws.outcomes.map(o => `
+              <div style="display:flex;align-items:flex-start;gap:.5rem;">
+                <span style="color:#2e7d32;font-size:.85rem;flex-shrink:0;margin-top:.05rem;">✓</span>
+                <span style="font-size:.78rem;color:var(--mid);line-height:1.55;">${o}</span>
+              </div>`).join('')}
+          </div>
+        </div>
+
+        ${progressBar}
+
+        <button onclick="${btnAction}" style="margin-top:.85rem;width:100%;background:${ws.comingSoon?'#B07D2A':owned?'var(--teal)':'var(--rust)'};color:#fff;border:none;padding:.5rem;border-radius:2rem;font-size:.82rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;">
+          ${btnLabel}
+        </button>
+      </div>`;
+  }).join('');
+}
+
+// ── WORKSHEET VIEWER ────────────────────────────────────
+window.openWorksheetResult = function(id, name) {
+  document.getElementById('ws-viewer-title').textContent = name;
+  document.querySelectorAll('#ws-viewer-content > div').forEach(d => d.style.display = 'none');
+  if (id === 'hieu-minh') {
+    document.getElementById('hm-wrapper').style.display = 'block';
+    hmInitGuide();
+  }
+  document.getElementById('ws-viewer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+
+window.openWorksheet = function(id, name) {
+  document.getElementById('ws-viewer-title').textContent = name;
+  document.querySelectorAll('#ws-viewer-content > div').forEach(d => d.style.display = 'none');
+  if (id === 'hieu-minh') {
+    document.getElementById('hm-wrapper').style.display = 'block';
+    hmInitGuide();
+  } else {
+    document.getElementById('ws-viewer-content').innerHTML += `<div style="padding:3rem;text-align:center;color:var(--mid);">Worksheet đang được cập nhật.</div>`;
+  }
+  document.getElementById('ws-viewer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeViewer = function() {
+  document.getElementById('ws-viewer').classList.remove('open');
+  document.body.style.overflow = '';
+};
+
+// ── WORKSHEET HIỂU MÌNH JS ──────────────────────────────
+const HM_QUESTIONS = [
+  {section:"Phần 1 - Bản thân",q:"Bạn làm việc tốt hơn khi có deadline hay tự do?",A:{main:"Cần deadline",sub:"Chạy tốt nhất khi có áp lực và kỳ vọng bên ngoài"},B:{main:"Cần tự do",sub:"Làm tốt nhất khi tự quản lý tiến độ theo nhịp của mình"},verify:["Nhớ lại 3 lần bạn làm việc hiệu quả nhất trong 6 tháng qua - lúc đó có deadline không?","Khi không có deadline, bạn thường làm gì: bắt đầu sớm, để đến phút chót, hay không làm?","Nếu được chọn: môi trường có KPI hàng tuần rõ ràng, hay môi trường tự quyết tiến độ?"],guide:{A:"Môi trường có áp lực rõ, KPI, deadline cụ thể (VD: sales, agency, vận hành, nhịp nhanh...)",B:"Môi trường tự quản lý, ít giám sát chặt (VD: research, engineering, creative tự do...)"}},
+  {section:"Phần 1 - Bản thân",q:"Bạn thích bắt đầu hay hoàn thiện?",A:{main:"Thích bắt đầu",sub:"Hứng khởi nhất ở giai đoạn khởi tạo và khai phá"},B:{main:"Thích hoàn thiện",sub:"Thỏa mãn khi đẩy thứ đang có đến mức tốt nhất có thể"},verify:["Nhìn lại các dự án bạn từng làm - bạn thường sôi nổi nhất ở giai đoạn nào: đầu, giữa, hay cuối?","Bạn cảm thấy thế nào khi phải 'dọn dẹp' hoặc hoàn thiện một thứ người khác đã bắt đầu?","Khi có 1 ý tưởng mới trong đầu, bạn muốn lao vào làm ngay hay suy nghĩ kỹ trước khi bắt đầu?"],guide:{A:"Môi trường khởi tạo liên tục, nhiều dự án mới (VD: entrepreneur, product 0-to-1, creative, R&D...)",B:"Môi trường cải tiến và tối ưu thứ đã có (VD: operations, QA, engineering cải tiến, brand lâu dài...)"}},
+  {section:"Phần 1 - Bản thân",q:"Bạn thấy mệt vì giao tiếp hay vì suy nghĩ quá nhiều?",A:{main:"Mệt vì giao tiếp",sub:"Cần thời gian một mình để nạp lại năng lượng sau khi làm việc với nhiều người"},B:{main:"Mệt vì suy nghĩ",sub:"Giao tiếp nạp năng lượng, một mình suy nghĩ nhiều lại mệt hơn"},verify:["Sau một ngày họp liên tục với nhiều người, bạn cảm thấy thế nào: kiệt sức hay vẫn ổn?","Công việc lý tưởng của bạn trông như thế nào: làm việc độc lập nhiều hay làm việc với người khác nhiều?","Khi cần giải quyết vấn đề khó, bạn thường muốn suy nghĩ một mình trước hay thảo luận ngay?"],guide:{A:"Môi trường nhiều không gian làm việc độc lập, ít họp (VD: developer, researcher, analyst, writer...)",B:"Môi trường tương tác nhiều, làm việc nhóm thường xuyên (VD: sales, HR, teaching, customer success...)"}},
+  {section:"Phần 1 - Bản thân",q:"Bạn học nhanh qua làm hay qua đọc/nghe?",A:{main:"Học qua làm",sub:"Thực chiến ngay, thử-sai, rút kinh nghiệm từ thực tế"},B:{main:"Học qua đọc/nghe",sub:"Hiểu lý thuyết và khung trước, rồi mới áp dụng"},verify:["Nghĩ về lần bạn học được kỹ năng nhanh nhất - bạn học bằng cách nào?","Khi onboard vào công việc mới, bạn thích được giao task để làm ngay hay được đào tạo lý thuyết trước?","Khi đọc sách/tài liệu dài mà chưa có bối cảnh thực tế, bạn thường tiếp thu được bao nhiêu?"],guide:{A:"Môi trường thực chiến, ít đào tạo lý thuyết (VD: startup, agency, sales, vận hành...)",B:"Môi trường có hệ thống đào tạo bài bản (VD: corporate lớn, consulting firm, MNC có L&D tốt...)"}},
+  {section:"Phần 1 - Bản thân",q:"Bạn có xu hướng kiểm soát hay linh hoạt?",A:{main:"Thích kiểm soát",sub:"Cần quy trình, scope rõ ràng, ít thay đổi đột ngột"},B:{main:"Thích linh hoạt",sub:"Phát triển tốt trong môi trường biến đổi liên tục"},verify:["Khi một kế hoạch thay đổi đột ngột, phản ứng đầu tiên là gì: bực bội vì mất trật tự hay hứng khởi vì thách thức mới?","Bạn làm việc tốt hơn khi có checklist chi tiết, hay khi có mục tiêu lớn và tự chọn cách làm?","Nhớ lại môi trường làm việc/học tập bạn thấy thoải mái nhất - nó có cấu trúc rõ ràng hay linh hoạt?"],guide:{A:"Môi trường có quy trình rõ, scope ổn định (VD: corporate, finance, legal, operations, project management...)",B:"Môi trường thay đổi nhanh, scope mở rộng liên tục (VD: startup, growth roles, consulting, business development...)"}},
+  {section:"Phần 1 - Bản thân",q:"Bạn thích làm việc với số liệu hay cảm xúc con người?",A:{main:"Thiên về số liệu",sub:"Nhìn thấy logic, xu hướng và tối ưu ở mọi nơi"},B:{main:"Thiên về con người",sub:"Nhìn thấy động lực, cảm xúc và kết nối quan hệ"},verify:["Khi giải quyết vấn đề, thứ bạn tìm đến đầu tiên là gì: data và số liệu, hay hỏi người liên quan?","Bạn hứng thú hơn khi đọc báo cáo phân tích thị trường, hay khi nghe ai đó kể về hành trình của họ?","Loại feedback nào có giá trị hơn: 'con số tháng này tốt lên 20%' hay 'bạn đã giúp team rất nhiều'?"],guide:{A:"Môi trường ra quyết định bằng data (VD: data analyst, finance, performance marketing, BI...)",B:"Môi trường cần hiểu và tác động đến hành vi/cảm xúc (VD: HR, brand marketing, education, coaching...)"}},
+  {section:"Phần 1 - Bản thân",q:"Bạn có chịu được việc bị từ chối liên tục không?",A:{main:"Chịu được từ chối",sub:"Từ chối không ảnh hưởng nhiều, phục hồi nhanh và tiếp tục"},B:{main:"Khó chịu được",sub:"Bị từ chối ảnh hưởng đến năng lượng và tự tin đáng kể"},verify:["Nhớ lại lần cuối bạn bị từ chối rõ ràng - bạn mất bao lâu để 'over it' và tiếp tục?","Nếu công việc đòi hỏi nghe 'không' 10 lần mỗi ngày, bạn nghĩ mình sẽ thế nào sau 1 tháng?","Bạn có xu hướng coi từ chối là phản ánh về bản thân, hay về thời điểm và hoàn cảnh?"],guide:{A:"Môi trường tiếp xúc nhiều người lạ, tỷ lệ thành công thấp là bình thường (VD: sales, business development, fundraising...)",B:"Môi trường ít đối mặt với rejection trực tiếp (VD: research, engineering, finance, content, product...)"}},
+  {section:"Phần 1 - Bản thân",q:"Bạn dễ chán khi mọi thứ lặp lại?",A:{main:"Chịu được lặp lại",sub:"Tìm thấy ý nghĩa trong việc tối ưu và cải thiện thứ đã có"},B:{main:"Cần đổi mới liên tục",sub:"Mất động lực nhanh nếu không có gì mới để học hay thử"},verify:["Nếu phải làm cùng một loại task trong 3 tuần liên tiếp, bạn cảm thấy thế nào vào tuần thứ 3?","Điều gì giúp ngày làm việc của bạn có ý nghĩa: làm được thứ mới hay làm một thứ quen ngày càng tốt hơn?","Bạn tìm thấy niềm vui trong việc tối ưu và cải thiện, hay trong việc khám phá và thử nghiệm?"],guide:{A:"Môi trường tập trung tối ưu quy trình, ổn định là chuẩn mực (VD: operations, finance, QA, customer support...)",B:"Môi trường luôn có dự án mới, không gian thử nghiệm rộng (VD: creative, strategy, product development, growth...)"}},
+  {section:"Phần 1 - Bản thân",q:"Bạn thích làm sâu 1 thứ hay biết nhiều thứ?",A:{main:"Đi sâu (Specialist)",sub:"Đào sâu một lĩnh vực, trở thành người không thể thiếu"},B:{main:"Đi rộng (Generalist)",sub:"Kết nối nhiều mảng, nhìn thấy bức tranh toàn cảnh"},verify:["Nếu được chọn: học một thứ cực kỳ sâu trong 1 năm, hay học 5 thứ ở mức khá - bạn chọn gì và tại sao?","Bạn thấy hứng hơn khi chuyên sâu vào một vấn đề cụ thể, hay khi cần nhìn toàn bức tranh và kết nối nhiều mảng?","Nhìn vào người bạn ngưỡng mộ nhất trong sự nghiệp - họ là specialist hay generalist?"],guide:{A:"Môi trường cho phép tập trung lâu dài vào một chuyên môn (VD: data science, engineering, design, finance specialist...)",B:"Môi trường cần kết nối nhiều mảng, nhìn toàn bức tranh (VD: product management, consulting, chief of staff, startup founder...)"}},
+  {section:"Phần 1 - Bản thân",q:"Bạn cần người hướng dẫn hay tự mò tốt?",A:{main:"Cần hướng dẫn",sub:"Phát triển tốt nhất với mentor, quy trình và onboarding rõ ràng"},B:{main:"Tự mò tốt",sub:"Phát triển tốt nhất khi tự tìm cách giải quyết vấn đề"},verify:["Khi gặp task hoàn toàn mới mà không ai chỉ, bạn cảm thấy thế nào: hứng khởi hay lo lắng?","Nghĩ về thời điểm bạn học được nhiều nhất - ai đó hướng dẫn bạn hay bạn tự mày mò?","Bạn muốn sếp là người chỉ bảo chi tiết, hay người đặt mục tiêu và để bạn tự tìm cách?"],guide:{A:"Môi trường có structured onboarding, mentor, training bài bản (VD: corporate lớn, MNC, consulting firm...)",B:"Môi trường ít hand-holding, tự tìm cách giải quyết là chuẩn mực (VD: startup, agency, freelance, early-stage company...)"}},
+  {section:"Phần 2 - Giá trị",q:"Bạn muốn kiếm tiền nhanh hay xây nền tảng lâu dài?",A:{main:"Kiếm tiền nhanh",sub:"Chấp nhận biến động cao đổi lấy thu nhập sớm"},B:{main:"Xây nền tảng",sub:"Chấp nhận chậm đổi lấy kỹ năng và network bền vững"},verify:["Trong 3 năm tới, điều nào sẽ khiến bạn hối hận hơn: kiếm ít tiền hơn mong đợi hay chậm xây được kỹ năng và network?","Bạn cảm thấy thế nào khi thu nhập tháng này cao hơn 50% nhưng tháng sau lại giảm 30%?","Bạn đang ở giai đoạn nào của cuộc sống - có thể chịu được rủi ro tài chính hay cần sự ổn định?"],guide:{A:"Môi trường thu nhập biến đổi theo kết quả, tốc độ cao (VD: sales commission, startup với equity, trading, freelance cao cấp...)",B:"Môi trường lương ổn định, đầu tư dài hạn (VD: corporate, consulting, ngân hàng, product management...)"}},
+  {section:"Phần 2 - Giá trị",q:"Bạn thích tạo ra thứ hữu hình hay vô hình?",A:{main:"Hữu hình",sub:"Sau mỗi ngày thấy được output cụ thể - code, bài viết, sản phẩm"},B:{main:"Vô hình",sub:"Tạo ra giá trị qua hệ thống, văn hóa, quan hệ và chiến lược"},verify:["Nhìn lại tuần vừa rồi, bạn thấy mình đã 'tạo ra' thứ gì? Cảm giác đó có đủ để ngày làm việc có ý nghĩa không?","Bạn cần thấy thành quả ngay trong ngày/tuần, hay thoải mái với việc kết quả chỉ hiện ra sau nhiều tháng?","Công việc nào trong quá khứ cho bạn cảm giác thỏa mãn nhất - nó tạo ra thứ hữu hình hay vô hình?"],guide:{A:"Môi trường có output rõ ràng sau mỗi task (VD: developer, designer, content creator, product, manufacturing...)",B:"Môi trường tạo giá trị qua hệ thống, văn hóa, quan hệ (VD: HR, strategy, consulting, investor, policy...)"}},
+  {section:"Phần 2 - Giá trị",q:"Bạn muốn impact ở quy mô cá nhân hay hệ thống?",A:{main:"Impact cá nhân",sub:"Thay đổi cuộc đời từng người, thấy kết quả ngay trước mắt"},B:{main:"Impact hệ thống",sub:"Xây hệ thống ảnh hưởng nhiều người dù không biết tên họ"},verify:["Bạn thỏa mãn hơn khi: nhìn thấy một người thay đổi rõ rệt nhờ mình, hay biết hệ thống mình xây đang phục vụ hàng nghìn người?","Trong công việc lý tưởng, bạn muốn biết tên những người mình đã giúp, hay ổn với tác động ở quy mô lớn nhưng ẩn danh?","Khi giúp được ai đó, phần nào quan trọng hơn: cuộc trò chuyện trực tiếp hay kết quả đo lường được về sau?"],guide:{A:"Môi trường làm việc trực tiếp với từng người (VD: HR, giáo dục, coaching, tư vấn 1-1, social work...)",B:"Môi trường xây sản phẩm/quy trình ảnh hưởng nhiều người cùng lúc (VD: product, engineering, operations, policy...)"}},
+  {section:"Phần 2 - Giá trị",q:"Bạn thích giải quyết vấn đề rõ hay mơ hồ?",A:{main:"Vấn đề rõ ràng",sub:"Có input, output, và quy trình từ A đến B"},B:{main:"Vấn đề mơ hồ",sub:"Không có câu trả lời sẵn, phải tự tìm đường đi"},verify:["Bạn thích nhận task với yêu cầu chi tiết và tiêu chí rõ, hay task chỉ có mục tiêu và tự quyết cách làm?","Khi gặp vấn đề không có câu trả lời rõ ràng, bạn cảm thấy hứng khởi với thách thức hay lo lắng?","Lần gần nhất phải tự tìm hướng mà không ai chỉ - bạn thấy đó là cơ hội hay gánh nặng?"],guide:{A:"Môi trường có input/output xác định, quy trình chuẩn (VD: finance, operations, QA, developer, data analyst...)",B:"Môi trường không có câu trả lời sẵn, cần tự tìm hướng (VD: strategy, consulting, product 0-to-1, entrepreneur, research...)"}},
+  {section:"Phần 2 - Giá trị",q:"Bạn muốn được ghi nhận bằng kết quả hay quá trình?",A:{main:"Ghi nhận kết quả",sub:"Con số nói lên tất cả, thành tích cuối kỳ là thước đo"},B:{main:"Ghi nhận quá trình",sub:"Nỗ lực, thái độ và cách làm việc cũng được trân trọng"},verify:["Bạn thấy frustrated hơn khi nào: làm rất tốt nhưng kết quả cuối không đẹp, hay kết quả tốt nhưng không ai thấy nỗ lực của bạn?","Nếu tháng này bạn làm hết mình nhưng không ra số vì lý do khách quan, bạn muốn sếp đánh giá bạn ra sao?","Loại feedback nào có ý nghĩa hơn: 'tháng này đạt 120% target' hay 'bạn đã xử lý rất tốt tình huống khó tuần vừa rồi'?"],guide:{A:"Môi trường đo bằng số rõ ràng, thành tích cuối kỳ (VD: sales, trading, performance marketing, growth roles...)",B:"Môi trường đánh giá thái độ, nỗ lực và cách làm việc (VD: HR, education, customer success, operations, research...)"}},
+  {section:"Phần 2 - Giá trị",q:"Bạn thích cạnh tranh hay hợp tác?",A:{main:"Thích cạnh tranh",sub:"Được kích thích khi cần nổi bật và vượt trội hơn người khác"},B:{main:"Thích hợp tác",sub:"Tìm thấy ý nghĩa khi nâng cả team lên cùng nhau"},verify:["Khi thấy đồng nghiệp được khen hoặc làm tốt hơn bạn, phản ứng đầu tiên là gì: muốn vượt qua họ hay muốn học từ họ?","Bạn thoải mái hơn khi ai cũng biết ranking của nhau, hay khi kết quả cá nhân được giữ riêng tư?","Thành tích nào bạn tự hào hơn: thứ bạn đạt được một mình hay thứ cả team đạt được nhờ đóng góp của bạn?"],guide:{A:"Môi trường đánh giá cá nhân rõ, thăng tiến dựa trên nổi bật (VD: investment banking, sales ranking, consulting, top tech companies...)",B:"Môi trường đề cao đóng góp tập thể, teamwork là chuẩn mực (VD: NGO, education, product team, creative agency...)"}},
+  {section:"Phần 2 - Giá trị",q:"Bạn có sẵn sàng làm việc ngoài giờ để đạt mục tiêu?",A:{main:"Sẵn sàng OT",sub:"Chấp nhận nhịp cao để đổi lấy tốc độ phát triển nhanh hơn"},B:{main:"Muốn cân bằng",sub:"Ưu tiên giờ giấc ổn định, có không gian cho những thứ khác"},verify:["Nếu phải chọn: lương cao hơn 40% nhưng thường xuyên làm tối và cuối tuần, hay lương bình thường và ra về đúng giờ?","Ngoài công việc, bạn đang đầu tư thời gian cho điều gì? Điều đó ảnh hưởng thế nào đến lựa chọn môi trường?","Nhìn lại 3-6 tháng gần nhất, nhịp làm việc nào khiến bạn cảm thấy tốt nhất?"],guide:{A:"Môi trường tốc độ cao, đánh giá bằng kết quả dù ngoài giờ (VD: startup, sales, investment banking, agency...)",B:"Môi trường giờ giấc ổn định, ít kỳ vọng làm thêm (VD: corporate, government, NGO, education, một số MNC...)"}},
+  {section:"Phần 2 - Giá trị",q:"Bạn thích tối ưu hay tạo mới?",A:{main:"Thích tạo mới",sub:"Hứng khởi nhất khi đối mặt với trang trắng và cơ hội mới"},B:{main:"Thích tối ưu",sub:"Hứng khởi nhất khi có hệ thống để cải thiện và scale"},verify:["Bạn hứng khởi hơn khi: được thử thứ hoàn toàn mới chưa ai làm, hay được cải thiện thứ đang có để tốt hơn đáng kể?","Khi nhìn vào một hệ thống, điều đầu tiên bạn nghĩ: 'mình có thể làm khác không?' hay 'mình có thể làm hiệu quả hơn không?'","Công việc nào bạn làm tốt nhất trong quá khứ - nó đòi hỏi bạn tạo ra thứ mới hay tối ưu thứ đã có?"],guide:{A:"Môi trường liên tục thử nghiệm, không có script sẵn (VD: creative agency, product 0-to-1, marketing, R&D...)",B:"Môi trường cải thiện hệ thống hiện có, đo lường rõ ràng (VD: operations, finance, data, growth optimization...)"}},
+  {section:"Phần 2 - Giá trị",q:"Bạn muốn kỹ năng của mình dễ thay thế hay khó thay thế?",A:{main:"Khó thay thế",sub:"Đầu tư thời gian dài để build chuyên môn sâu và đòn bẩy cao"},B:{main:"Linh hoạt, dễ vào",sub:"Học kỹ năng phổ thông, bắt đầu nhanh và có nhiều lựa chọn"},verify:["Kỹ năng chính bạn đang phát triển - có bao nhiêu người cùng cấp đang học điều tương tự?","Bạn có kế hoạch gì để trong 2-3 năm tới, trở thành người khó tìm được ai thay thế?","Bạn sẵn sàng tập trung vào một mảng hẹp trong 2 năm để trở thành chuyên gia, hay muốn duy trì sự linh hoạt?"],guide:{A:"Chọn con đường chuyên sâu, chấp nhận đầu tư thời gian dài (VD: ML engineer, tax specialist, UX researcher, data scientist...)",B:"Bắt đầu bằng kỹ năng phổ thông để vào nghề nhanh, nhưng cần kế hoạch differentiation rõ ràng về sau."}},
+  {section:"Phần 2 - Giá trị",q:"Bạn muốn làm việc gắn với đam mê hay thị trường?",A:{main:"Theo đam mê",sub:"Ưu tiên làm thứ mình thực sự hứng thú và có ý nghĩa"},B:{main:"Theo thị trường",sub:"Ưu tiên làm thứ thị trường đang cần và trả tiền cao"},verify:["Bạn có những gì thực sự hứng thú - không phải vì ai bảo, mà vì tự nhiên bạn dành thời gian cho nó? Viết ra 3-5 thứ.","Trong những thứ đó, thứ nào đã có người trả tiền cho nó dưới bất kỳ hình thức nào?","Nếu làm việc trong ngành bạn không hứng thú nhưng lương rất cao, bạn nghĩ mình sẽ cảm thấy thế nào sau 3 năm?"],guide:{A:"Tìm giao điểm: 'Trong lĩnh vực tôi thích, thị trường đang cần phiên bản nào?' (VD: thích viết - content B2B; thích dạy - corporate L&D...)",B:"Vào ngành thị trường đang cần, nhưng tìm cách cá nhân hóa bằng hứng thú của mình để duy trì động lực dài hạn."}},
+  {section:"Phần 3 - Môi trường",q:"Bạn chịu được áp lực KPI không?",A:{main:"Chịu được KPI số",sub:"Thích sự minh bạch - con số cho bạn biết mình đang đứng ở đâu"},B:{main:"Không hợp KPI cứng",sub:"Cần hệ đo lường linh hoạt hơn, khó đo bằng số"},verify:["Nếu sếp hỏi 'tháng này bạn làm được gì?', bạn muốn trả lời bằng số liệu cụ thể hay bằng câu chuyện về đóng góp?","Bạn cảm thấy thế nào khi biết mình đang ở đâu so với target tháng này: có động lực hơn hay áp lực hơn?","Khi không đạt target vì lý do ngoài tầm kiểm soát, bạn nghĩ hệ thống đánh giá bằng KPI là công bằng không?"],guide:{A:"Môi trường đo bằng con số, thành tích rõ ràng (VD: sales, performance marketing, finance, operations...)",B:"Môi trường đánh giá qua impact khó định lượng (VD: HR, strategy, research, education, creative roles...)"}},
+  {section:"Phần 3 - Môi trường",q:"Bạn thích môi trường rõ ràng hay linh hoạt?",A:{main:"Rõ ràng",sub:"JD chi tiết, quy trình có sẵn, kỳ vọng được viết ra rõ ràng"},B:{main:"Linh hoạt",sub:"Role fluid, tự định nghĩa scope, thử và sai nhiều"},verify:["Khi nhận dự án mới, bạn thích nhận brief chi tiết với tiêu chí rõ, hay chỉ cần biết mục tiêu và tự xác định cách làm?","Bạn cảm thấy thế nào khi scope công việc thay đổi giữa chừng: bực bội vì mất kế hoạch hay thoải mái vì thích nghi?","Hỏi thật: bạn nói muốn linh hoạt vì thực sự làm tốt trong đó, hay vì nó nghe 'progressive' hơn?"],guide:{A:"Môi trường JD chi tiết, SOP đầy đủ, kỳ vọng minh bạch (VD: corporate lớn, MNC, government, ngân hàng...)",B:"Môi trường role fluid, bạn tự định nghĩa scope (VD: startup, agency, freelance, early-stage company...)"}},
+  {section:"Phần 3 - Môi trường",q:"Bạn cần sếp là người mentor hay người quản lý?",A:{main:"Cần mentor",sub:"Sếp đầu tư vào sự phát triển, chia sẻ cách tư duy và sai lầm"},B:{main:"Ổn với người quản lý",sub:"Sếp giao việc rõ, đánh giá kết quả - bạn tự định hướng"},verify:["Trong giai đoạn hiện tại, bạn cần học cách tư duy về công việc nhiều hơn, hay cần không gian để tự thực thi?","Khi nhận offer, bạn có chủ động tìm hiểu phong cách quản lý của người sẽ là sếp không? Nếu không, tại sao?","Nghĩ về người sếp hoặc thầy/cô đã ảnh hưởng tích cực nhất đến bạn - họ mentor hay quản lý bạn?"],guide:{A:"Môi trường có culture coaching rõ ràng, sếp đầu tư vào người trẻ (VD: consulting firm lớn, MNC có L&D bài bản...)",B:"Môi trường ít hand-holding, sếp giao việc và tin tưởng bạn tự tìm cách (VD: startup, team nhỏ, môi trường autonomy cao...)"}},
+  {section:"Phần 3 - Môi trường",q:"Team nhỏ hay tổ chức lớn - bạn học tốt hơn ở đâu?",A:{main:"Team nhỏ",sub:"Đụng nhiều việc, học đa dạng, thấy impact nhanh"},B:{main:"Tổ chức lớn",sub:"Học sâu một mảng, có hệ thống và mentor tốt"},verify:["Bạn muốn sau 1-2 năm đầu có thể nói gì: 'Tôi đã trải qua nhiều mảng' hay 'Tôi hiểu rất sâu về X'?","Khi không có mentor hoặc hệ thống hỗ trợ, bạn cảm thấy thế nào: vui vì tự do hay lo vì không có người chỉ?","Nhìn vào người bạn muốn trở thành trong 5 năm - họ xây nền tảng bằng cách học đa dạng hay học chuyên sâu?"],guide:{A:"Môi trường nhỏ, đụng nhiều việc cùng lúc (VD: startup, SME, agency, early-stage...)",B:"Môi trường phân công rõ, đào tạo bài bản (VD: corporate lớn, MNC, consulting firm, ngân hàng...)"}},
+  {section:"Phần 3 - Môi trường",q:"Bạn muốn lộ trình rõ hay tự tạo đường đi?",A:{main:"Lộ trình rõ ràng",sub:"Biết năm 1-3-5 mình sẽ ở đâu nếu làm tốt"},B:{main:"Tự tạo đường",sub:"Tự định nghĩa vai trò, tự vẽ career path của mình"},verify:["Bạn thấy an tâm hơn khi biết rõ điều kiện thăng tiến, hay thích tự quyết định mình muốn phát triển theo hướng nào?","Khi không biết 'công ty đang đánh giá mình thế nào', bạn cảm thấy bình thường hay lo lắng?","Career path lý tưởng của bạn trông như thế nào: có các milestone rõ ràng hay một hướng mở với nhiều khả năng?"],guide:{A:"Môi trường có promotion path minh bạch (VD: Big 4, banking, MNC có career ladder rõ ràng...)",B:"Môi trường không có career map định sẵn (VD: startup, freelance, creative, entrepreneur...)"}},
+  {section:"Phần 3 - Môi trường",q:"Bạn thích tốc độ nhanh hay chắc chắn?",A:{main:"Tốc độ nhanh",sub:"Launch sớm, sai rồi sửa, học nhiều trong thời gian ngắn"},B:{main:"Chắc chắn",sub:"Làm kỹ trước khi ra, ít lỗi, tiến độ ổn định và kiểm soát"},verify:["Bạn thoải mái hơn khi: launch sớm và cải thiện dần, hay dành thêm thời gian để chắc chắn trước khi ra mắt?","Khi sản phẩm/công việc của bạn có lỗi hoặc không hoàn hảo, bạn cảm thấy thế nào: học được gì hay stress vì không đạt chuẩn?","Quyết định tốt với bạn là quyết định đúng, hay quyết định nhanh rồi điều chỉnh sau?"],guide:{A:"Môi trường ưu tiên tốc độ, chấp nhận sai rồi sửa (VD: startup, agency, sales, growth roles...)",B:"Môi trường đặt độ chính xác lên trên tốc độ (VD: banking, finance, engineering hệ thống critical, legal, healthcare...)"}},
+  {section:"Phần 3 - Môi trường",q:"Bạn muốn môi trường cạnh tranh hay an toàn?",A:{main:"Cạnh tranh",sub:"Áp lực liên tục từ đồng nghiệp giỏi giúp bạn phát triển nhanh"},B:{main:"An toàn",sub:"Không gian ổn định, ít so sánh, được thử và sai mà không sợ"},verify:["Khi xung quanh đều là người giỏi hơn bạn, bạn thường cảm thấy gì đầu tiên: được kích thích muốn theo kịp hay áp lực và muốn trốn tránh?","Bạn làm tốt hơn khi biết mình đang bị so sánh với đồng nghiệp, hay khi chỉ tập trung vào công việc của chính mình?","Nghĩ về những giai đoạn bạn phát triển nhanh nhất - môi trường đó có cạnh tranh hay an toàn?"],guide:{A:"Môi trường có pressure liên tục, bị so sánh là bình thường (VD: investment banking, consulting, sales ranking, top tech companies...)",B:"Môi trường ổn định tâm lý, ít so sánh, không gian để thử và sai (VD: NGO, government, education, SME culture tốt...)"}},
+  {section:"Phần 3 - Môi trường",q:"Bạn có chấp nhận rủi ro nghề nghiệp không?",A:{main:"Chấp nhận rủi ro cao",sub:"Upside lớn, biến động nhiều - sẵn sàng đánh đổi để đổi lấy cơ hội"},B:{main:"Muốn rủi ro thấp",sub:"Ổn định, ít biến động - chấp nhận tăng trưởng chậm hơn nhưng chắc"},verify:["Nếu công ty bạn vào đóng cửa sau 1 năm, bạn có thể bước tiếp không? Trong năm đó bạn đang build gì là tài sản thật sự của bạn?","Bạn sẽ hối hận hơn vì đã không thử, hay vì đã thử và thất bại?","Mức thu nhập giảm 30% so với tháng trước sẽ ảnh hưởng đến cuộc sống của bạn như thế nào?"],guide:{A:"Môi trường upside lớn nhưng biến động nhiều (VD: startup seed stage, freelance, commission-based, entrepreneur...)",B:"Môi trường ổn định, ít biến động, tăng trưởng chậm nhưng chắc (VD: MNC, government, ngân hàng lớn, corporate...)"}},
+  {section:"Phần 3 - Môi trường",q:"Bạn muốn làm việc trong thị trường local hay global/remote?",A:{main:"Local",sub:"Thị trường trong nước, dễ vào, network và văn hóa quen thuộc"},B:{main:"Global/Remote",sub:"Tiêu chuẩn quốc tế, pool cơ hội rộng hơn, lương cao hơn"},verify:["Trong 5 năm tới, bạn muốn làm việc với team Việt Nam hay team international từ nhiều nước?","Tiếng Anh của bạn hiện tại đủ để làm việc professional hoàn toàn bằng tiếng Anh chưa? Nếu chưa, kế hoạch là gì?","Bạn đang chuẩn bị gì để match với tiêu chuẩn của thị trường bạn muốn vào?"],guide:{A:"Môi trường trong nước, dễ vào hơn nhưng cần kế hoạch differentiation rõ (VD: doanh nghiệp Việt, SME, government, retail...)",B:"Môi trường cross-border, tiêu chuẩn quốc tế (VD: tech company nước ngoài, remote-first startup, MNC, outsourcing...)"}},
+  {section:"Phần 3 - Môi trường",q:"Bạn muốn công việc ổn định hay nhiều cơ hội bứt phá?",A:{main:"Ổn định",sub:"Ít biến động, thu nhập đều, phù hợp khi cần tập trung vào thứ khác"},B:{main:"Bứt phá",sub:"Tốc độ cao, upside lớn, phù hợp khi sẵn sàng all-in vào career"},verify:["Giai đoạn này của cuộc đời, bạn cần gì nhiều hơn: sự ổn định để tập trung vào thứ khác, hay tốc độ tăng trưởng cao dù không chắc chắn?","Nhìn vào 12 tháng tới - có sự kiện lớn nào (gia đình, học tập, sức khỏe) ảnh hưởng đến mức độ rủi ro bạn có thể dành cho career không?","Bạn đang chọn vì nó phù hợp với giai đoạn hiện tại, hay vì áp lực xã hội?"],guide:{A:"Môi trường ít biến động, phù hợp khi cần tập trung vào thứ khác trong cuộc sống (VD: corporate, MNC, government, ngân hàng...)",B:"Môi trường tốc độ cao, phù hợp khi sẵn sàng all-in vào career (VD: startup, sales commission, entrepreneur, growth roles...)"}}
+];
+
+const HM_API_KEY = ''; // Không dùng nữa - gọi qua Apps Script proxy
+let hmCurrent = 0;
+let hmAnswers = {};
+
+function hmInitGuide() {
+  // Hiện trang hướng dẫn, ẩn các phần khác
+  document.getElementById('hm-guide').style.display = 'block';
+  document.getElementById('hm-progress').style.display = 'none';
+  document.getElementById('hm-main').style.display = 'none';
+  document.getElementById('hm-result').style.display = 'none';
+  document.getElementById('hm-nav').style.display = 'none';
+  document.getElementById('ws-viewer-content').scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+window.hmStartFromGuide = function() {
+  document.getElementById('hm-guide').style.display = 'none';
+  const savedResult = localStorage.getItem('hm_ai_result');
+  const answers = JSON.parse(localStorage.getItem('hm_answers') || '{}');
+  const answeredCount = Object.keys(answers).filter(k => answers[k]?.choice).length;
+
+  if (savedResult && answeredCount === 30) {
+    // Đã có kết quả → mở thẳng trang kết quả
+    hmAnswers = answers;
+    hmRenderQuestions();
+    document.getElementById('hm-main').style.display = 'none';
+    document.getElementById('hm-progress').style.display = 'none';
+    document.getElementById('hm-nav').style.display = 'none';
+    document.getElementById('hm-result').style.display = 'block';
+    document.getElementById('hm-answers').innerHTML = HM_QUESTIONS.map((q, i) => {
+      const a = hmAnswers[i]; const ch = a?.choice || '?';
+      const label = ch === 'A' ? q.A.main : (ch === 'B' ? q.B.main : '?');
+      return `<div class="hm-chip ch-${ch}"><div class="hm-chip-q">Câu ${i+1}</div><div class="hm-chip-a">${ch}: ${label}</div></div>`;
+    }).join('');
+    document.getElementById('hm-ai-loading').style.display = 'none';
+    document.getElementById('hm-ai-content').style.display = 'block';
+    document.getElementById('hm-ai-content').innerHTML = savedResult;
+  } else {
+    hmInit();
+  }
+};
+
+function hmInit() {
+  const saved = localStorage.getItem('hm_answers');
+  if (saved) { try { hmAnswers = JSON.parse(saved); } catch(e) {} }
+  // Reset về câu hỏi nếu chưa xem kết quả
+  document.getElementById('hm-result').style.display = 'none';
+  document.getElementById('hm-main').style.display = 'block';
+  document.getElementById('hm-progress').style.display = 'block';
+  document.getElementById('hm-nav').style.display = 'flex';
+  hmRenderQuestions();
+  hmShowQuestion(hmCurrent);
+}
+
+function hmRenderQuestions() {
+  const main = document.getElementById('hm-main');
+  main.innerHTML = '';
+  HM_QUESTIONS.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'hm-qcard' + (i === 0 ? ' active' : '');
+    card.id = `hm-q-${i}`;
+    card.innerHTML = `
+      <div class="hm-section-tag">${q.section} · Câu ${i+1}/30</div>
+      <div class="hm-qnum">${String(i+1).padStart(2,'0')}</div>
+      <div class="hm-qtext">${q.q}</div>
+      <div class="hm-choices">
+        <button class="hm-choice" data-ch="A" onclick="hmSelect(${i},'A')">
+          <div class="hm-choice-letter">A</div>
+          <div class="hm-choice-main">${q.A.main}</div>
+          <div class="hm-choice-sub">${q.A.sub}</div>
+        </button>
+        <button class="hm-choice" data-ch="B" onclick="hmSelect(${i},'B')">
+          <div class="hm-choice-letter">B</div>
+          <div class="hm-choice-main">${q.B.main}</div>
+          <div class="hm-choice-sub">${q.B.sub}</div>
+        </button>
+      </div>
+      <div class="hm-verify">
+        <div class="hm-verify-label">Xác minh lựa chọn của bạn</div>
+        <div class="hm-verify-hint">Điền ít nhất 1 câu để tiếp tục. Điền đủ 3 câu giúp kết quả chính xác hơn.</div>
+        ${q.verify.map((vq, vi) => `
+          <div class="hm-verify-item">
+            <div class="hm-verify-q">${vi+1}. ${vq}</div>
+            <textarea class="hm-verify-input" id="hm-v-${i}-${vi}" rows="2"
+              oninput="hmVerifyInput(${i},${vi})"
+              placeholder="Nhớ lại trải nghiệm của bạn và viết...">${hmAnswers[i]?.verify?.[vi] || ''}</textarea>
+          </div>`).join('')}
+      </div>`;
+    main.appendChild(card);
+  });
+}
+
+function hmRestoreState() {
+  HM_QUESTIONS.forEach((q, i) => {
+    if (hmAnswers[i]) {
+      const ch = hmAnswers[i].choice;
+      if (ch) {
+        document.querySelectorAll(`#hm-q-${i} .hm-choice`).forEach(b => {
+          b.classList.remove('sel-A','sel-B');
+          if (b.dataset.ch === ch) b.classList.add(`sel-${ch}`);
+        });
+      }
+      (hmAnswers[i].verify || []).forEach((v, vi) => {
+        const el = document.getElementById(`hm-v-${i}-${vi}`);
+        if (el && v) { el.value = v; el.classList.add('filled'); }
+      });
+    }
+  });
+}
+
+window.hmSelect = function(qi, ch) {
+  if (!hmAnswers[qi]) hmAnswers[qi] = { choice: null, verify: ['','',''] };
+  hmAnswers[qi].choice = ch;
+  localStorage.setItem('hm_answers', JSON.stringify(hmAnswers));
+  document.querySelectorAll(`#hm-q-${qi} .hm-choice`).forEach(b => {
+    b.classList.remove('sel-A','sel-B');
+    if (b.dataset.ch === ch) b.classList.add(`sel-${ch}`);
+  });
+};
+
+window.hmVerifyInput = function(qi, vi) {
+  if (!hmAnswers[qi]) hmAnswers[qi] = { choice: null, verify: ['','',''] };
+  if (!hmAnswers[qi].verify) hmAnswers[qi].verify = ['','',''];
+  const el = document.getElementById(`hm-v-${qi}-${vi}`);
+  hmAnswers[qi].verify[vi] = el.value;
+  el.classList.toggle('filled', el.value.trim().length > 0);
+  localStorage.setItem('hm_answers', JSON.stringify(hmAnswers));
+};
+
+function hmShowQuestion(idx) {
+  document.querySelectorAll('.hm-qcard').forEach(c => c.classList.remove('active'));
+  const card = document.getElementById(`hm-q-${idx}`);
+  if (card) card.classList.add('active');
+  hmRestoreState();
+  const pct = Math.round((idx / HM_QUESTIONS.length) * 100);
+  document.getElementById('hm-progress-label').textContent = `Câu ${idx+1} / ${HM_QUESTIONS.length}`;
+  document.getElementById('hm-progress-pct').textContent = pct + '%';
+  document.getElementById('hm-progress-fill').style.width = pct + '%';
+  document.getElementById('hm-btn-back').style.visibility = idx === 0 ? 'hidden' : 'visible';
+  document.getElementById('hm-btn-next').textContent = idx === HM_QUESTIONS.length - 1 ? 'Xem kết quả →' : 'Tiếp theo →';
+  document.getElementById('ws-viewer-content').scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function hmIsComplete(idx) {
+  const a = hmAnswers[idx];
+  return a && a.choice && a.verify && a.verify.some(v => v.trim().length > 0);
+}
+
+window.hmGoNext = function() {
+  if (hmCurrent === HM_QUESTIONS.length - 1) {
+    const incomplete = HM_QUESTIONS.map((q,i) => ({i,q})).filter(({i}) => !hmIsComplete(i));
+    if (incomplete.length > 0) { hmShowIncompleteModal(incomplete); return; }
+    hmShowResult();
+  } else { hmCurrent++; hmShowQuestion(hmCurrent); }
+};
+
+window.hmGoBack = function() {
+  if (hmCurrent > 0) { hmCurrent--; hmShowQuestion(hmCurrent); }
+};
+
+function hmShowIncompleteModal(incomplete) {
+  document.getElementById('hm-incomplete-list').innerHTML = incomplete.map(({i, q}) => {
+    const a = hmAnswers[i];
+    const noChoice = !a || !a.choice;
+    const noVerify = !a?.verify?.some(v => v.trim().length > 0);
+    const status = noChoice && noVerify ? 'Chưa chọn & chưa xác minh' : noChoice ? 'Chưa chọn A/B' : 'Chưa có xác minh';
+    return `<div class="hm-incomplete-item" onclick="hmGoToQ(${i})">
+      <span class="hm-incomplete-num">Câu ${i+1}</span>
+      <span class="hm-incomplete-q">${q.q}</span>
+      <span class="hm-incomplete-status">${status}</span></div>`;
+  }).join('');
+  document.getElementById('hm-incomplete-modal').classList.add('show');
+}
+
+window.hmGoToQ = function(idx) { hmCloseModal(); hmCurrent = idx; hmShowQuestion(idx); };
+window.hmCloseModal = function() { document.getElementById('hm-incomplete-modal').classList.remove('show'); };
+window.hmCloseModalOutside = function(e) { if (e.target === document.getElementById('hm-incomplete-modal')) hmCloseModal(); };
+
+function hmShowResult() {
+  document.getElementById('hm-main').style.display = 'none';
+  document.getElementById('hm-progress').style.display = 'none';
+  document.getElementById('hm-nav').style.display = 'none';
+  document.getElementById('hm-result').style.display = 'block';
+  document.getElementById('ws-viewer-content').scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('hm-answers').innerHTML = HM_QUESTIONS.map((q, i) => {
+    const a = hmAnswers[i]; const ch = a?.choice || '?';
+    const label = ch === 'A' ? q.A.main : (ch === 'B' ? q.B.main : '?');
+    return `<div class="hm-chip ch-${ch}"><div class="hm-chip-q">Câu ${i+1}</div><div class="hm-chip-a">${ch}: ${label}</div></div>`;
+  }).join('');
+
+  // Kiểm tra đã có kết quả AI lưu chưa
+  const savedResult = localStorage.getItem('hm_ai_result');
+  if (savedResult) {
+    document.getElementById('hm-ai-loading').style.display = 'none';
+    document.getElementById('hm-ai-content').style.display = 'block';
+    document.getElementById('hm-ai-content').innerHTML = savedResult;
+  } else {
+    hmCallAI();
+  }
+}
+
+window.hmCallAI = async function() {
+  const loadEl = document.getElementById('hm-ai-loading');
+  const contentEl = document.getElementById('hm-ai-content');
+  const errorEl = document.getElementById('hm-ai-error');
+  loadEl.style.display = 'block'; contentEl.style.display = 'none'; errorEl.style.display = 'none';
+
+  const lines = HM_QUESTIONS.map((q, i) => {
+    const a = hmAnswers[i]; const ch = a?.choice || '?';
+    const guide = q.guide[ch] || '';
+    const verifyText = (a?.verify || []).filter(v => v.trim()).map((v,vi) => `   - Xác minh ${vi+1}: ${v}`).join('\n');
+    return `Câu ${i+1}: ${q.q}\n  Lựa chọn: ${ch} - ${ch==='A'?q.A.main:q.B.main}\n  Gợi ý định hướng: ${guide}\n${verifyText}`;
+  }).join('\n\n');
+
+  const prompt = `Bạn là chuyên gia tư vấn career người Việt của Career Planning by Tia Nguyễn. Dựa trên 30 câu trả lời và ví dụ xác minh thực tế của người dùng, hãy tổng hợp thành bản phân tích profile sự nghiệp ngắn gọn, thực tế và cá nhân hóa.
+
+Lưu ý quan trọng: Mỗi câu có phần "Xác minh" là ví dụ thực tế từ trải nghiệm của người dùng. Hãy ưu tiên dùng những thông tin này để cá nhân hóa phân tích - phản chiếu lại những gì họ viết để họ thấy bạn thực sự đọc và hiểu họ.
+
+Bản phân tích gồm 5 phần, viết tiếng Việt, thân thiện, ngắn gọn, cụ thể:
+
+**1. Cách bạn vận hành**
+Tổng hợp cách người này làm việc tốt nhất: nhịp độ, phong cách, điều kiện để phát huy tốt nhất. Dùng ví dụ xác minh của họ để minh họa. (3-5 câu)
+
+**2. Giá trị và động lực**
+Điều gì thực sự quan trọng với họ, họ được thúc đẩy bởi điều gì, muốn tạo ra loại impact nào. Dùng ví dụ xác minh của họ để minh họa. (3-5 câu)
+
+**3. Điểm mạnh nổi bật cần khai thác**
+Dựa trên pattern câu trả lời, chỉ ra 2-3 điểm mạnh cụ thể của người này trong thị trường lao động - không phải "bạn giỏi gì" mà là "thị trường đang cần gì từ người như bạn". (3-5 câu)
+
+**4. Môi trường phù hợp và cần tránh**
+Gợi ý cụ thể loại tổ chức, văn hóa, vai trò và 3-5 hướng đi phù hợp nhất. Đồng thời chỉ ra 1-2 loại môi trường người này nên tránh và lý do tại sao. (4-6 câu)
+
+**5. Rủi ro cần lưu ý**
+Dựa trên combination câu trả lời, chỉ ra 1-2 điểm người này dễ bị đặt sai vị trí hoặc dễ burn out nếu không chú ý. Cụ thể và thực tế, không chung chung. (2-3 câu)
+
+**6. Câu mô tả bản thân**
+Gợi ý 1-2 câu ngắn người dùng có thể dùng để giới thiệu bản thân trong phỏng vấn hoặc với mentor - dựa trên đúng profile của họ, không phải template chung.
+
+---
+DỮ LIỆU 30 CÂU TRẢ LỜI:
+
+${lines}`;
+
+  try {
+    const resp = await fetch(SCRIPT_V3_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        secret: SCRIPT_SECRET,
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 2000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await resp.json();
+    if (!data.success) throw new Error(data.error || 'Lỗi không xác định');
+    const text = data.content?.[0]?.text || '';
+    if (!text) throw new Error('Không nhận được phản hồi từ AI.');
+    loadEl.style.display = 'none'; contentEl.style.display = 'block';
+    const html = text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h3>$1</h3>').replace(/^# (.+)$/gm,'<h3>$1</h3>').replace(/^- (.+)$/gm,'<li>$1</li>').replace(/(<li>.*<\/li>\n?)+/g,m=>`<ul>${m}</ul>`).replace(/\n\n+/g,'</p><p>').split('\n').map(l=>l.startsWith('<')?l:(l.trim()?`<p>${l}</p>`:'')).join('');
+    contentEl.innerHTML = html;
+    localStorage.setItem('hm_ai_result', html);
+  } catch(err) {
+    loadEl.style.display = 'none'; errorEl.style.display = 'block';
+    errorEl.innerHTML = `Không thể tải phân tích AI. Lỗi: ${err.message}<br><br><button onclick="hmCallAI()" style="background:none;border:1px solid currentColor;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;">Thử lại</button>`;
+  }
+}
+
+window.hmToggleSummary = function() {
+  const answers = document.getElementById('hm-answers');
+  const toggle = document.getElementById('hm-summary-toggle');
+  const isHidden = answers.style.display === 'none';
+  answers.style.display = isHidden ? 'grid' : 'none';
+  toggle.textContent = isHidden ? 'Thu gọn ▲' : 'Mở rộng ▼';
+};
+
+window.hmReset = function() {
+  if (!confirm('Bạn có chắc muốn làm lại từ đầu? Tất cả câu trả lời sẽ bị xóa.')) return;
+  localStorage.removeItem('hm_answers');
+  localStorage.removeItem('hm_ai_result');
+  hmAnswers = {}; hmCurrent = 0;
+  document.getElementById('hm-result').style.display = 'none';
+  document.getElementById('hm-main').style.display = 'block';
+  document.getElementById('hm-progress').style.display = 'block';
+  document.getElementById('hm-nav').style.display = 'flex';
+  hmRenderQuestions(); hmShowQuestion(0);
+};
+
+// ── TABS ────────────────────────────────────────────────
+window.switchToUserView = function() {
+  renderApp(true);
+  showPage('app');
+};
+
+window.switchToAdminView = function() {
+  showPage('admin');
+};
+
+window.switchTab = function(tab) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('nav-' + tab).classList.add('active');
+};
+
+// ── ĐỔI MẬT KHẨU ───────────────────────────────────────
+window.doChangePassword = async function() {
+  const current = document.getElementById('pw-current').value;
+  const newPw = document.getElementById('pw-new').value;
+  const confirm = document.getElementById('pw-confirm').value;
+  const msg = document.getElementById('pw-msg');
+  msg.className = 'msg'; msg.style.display = 'none';
+
+  if (!current || !newPw || !confirm) return showMsg(msg, 'err', 'Vui lòng điền đầy đủ.');
+  if (newPw.length < 8) return showMsg(msg, 'err', 'Mật khẩu mới tối thiểu 8 ký tự.');
+  if (newPw !== confirm) return showMsg(msg, 'err', 'Mật khẩu xác nhận không khớp.');
+
+  try {
+    const cred = EmailAuthProvider.credential(currentUser.email, current);
+    await reauthenticateWithCredential(currentUser, cred);
+    await updatePassword(currentUser, newPw);
+    showMsg(msg, 'ok', 'Đổi mật khẩu thành công!');
+    document.getElementById('pw-current').value = '';
+    document.getElementById('pw-new').value = '';
+    document.getElementById('pw-confirm').value = '';
+  } catch(e) {
+    const errMap = {
+      'auth/wrong-password': 'Mật khẩu hiện tại không đúng.',
+      'auth/invalid-credential': 'Mật khẩu hiện tại không đúng.',
+    };
+    showMsg(msg, 'err', errMap[e.code] || 'Có lỗi xảy ra. Thử lại nhé.');
+  }
+};
+
+// ── ADMIN ───────────────────────────────────────────────
+async function loadAdminData() {
+  // Load users
+  const snap = await getDocs(collection(db, 'users_v3'));
+  const users = [];
+  snap.forEach(d => users.push({ uid: d.id, ...d.data() }));
+  renderUsersTable(users);
+
+  // Load worksheet stats
+  renderWorksheetAdminTable(users);
+}
+
+function renderUsersTable(users) {
+  const tbody = document.getElementById('users-tbody');
+  if (!users.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--light);padding:1.5rem;">Chưa có thành viên nào.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = users.map(u => `
+    <tr>
+      <td><strong>${u.username}</strong></td>
+      <td>${u.displayName || '-'}</td>
+      <td style="font-size:.8rem;color:var(--mid)">${u.email}</td>
+      <td>${(u.worksheets||[]).map(id => {
+        const ws = WORKSHEETS.find(w => w.id === id);
+        return ws ? `<span class="badge green">${ws.name}</span> ` : '';
+      }).join('') || '<span style="color:var(--light);font-size:.8rem">Chưa có</span>'}</td>
+      <td><span class="badge ${u.active !== false ? 'green' : 'grey'}">${u.active !== false ? 'Hoạt động' : 'Tạm dừng'}</span></td>
+      <td>
+        <div style="display:flex;gap:.4rem;">
+          <button class="btn-sm ghost" onclick="openAssignModal('${u.uid}','${u.username}',${JSON.stringify(u.worksheets||[])})">Worksheet</button>
+          <button class="btn-sm ghost" onclick="openResetPwModal('${u.uid}','${u.username}')">Reset PW</button>
+          <button class="btn-sm ${u.active !== false ? 'danger' : ''} ghost" onclick="toggleUserActive('${u.uid}',${u.active !== false})">${u.active !== false ? 'Tạm dừng' : 'Kích hoạt'}</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderWorksheetAdminTable(users) {
+  const tbody = document.getElementById('ws-admin-tbody');
+  tbody.innerHTML = WORKSHEETS.map(ws => {
+    const count = users.filter(u => (u.worksheets||[]).includes(ws.id)).length;
+    return `<tr>
+      <td><code style="font-size:.8rem">${ws.id}</code></td>
+      <td>${ws.icon} ${ws.name}</td>
+      <td>${count} thành viên</td>
+    </tr>`;
+  }).join('');
+}
+
+window.switchAdminTab = function(tab) {
+  document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.admin-tab-btn[onclick="switchAdminTab('${tab}')"]`).classList.add('active');
+  document.getElementById(`admin-panel-${tab}`).classList.add('active');
+};
+
+// Apps Script Ver3 endpoint - điền URL sau khi deploy
+const SCRIPT_V3_URL = 'PASTE_APPS_SCRIPT_V3_URL_HERE';
+const SCRIPT_SECRET = 'PASTE_YOUR_SECRET_TOKEN_HERE';
+
+// Generate mật khẩu ngẫu nhiên
+function generatePassword() {
+  const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const lower = 'abcdefghjkmnpqrstuvwxyz';
+  const digits = '23456789';
+  const special = '@#$!';
+  const rand = arr => arr[Math.floor(Math.random() * arr.length)];
+  const chars = upper + lower + digits;
+  let pw = rand(upper) + rand(lower) + rand(digits) + rand(special);
+  for (let i = 0; i < 4; i++) pw += rand(chars);
+  return pw.split('').sort(() => Math.random() - 0.5).join('');
+}
+
+// Gửi email chào mừng qua Apps Script
+async function sendWelcomeEmail({ displayName, email, username, password, worksheets }) {
+  const wsNames = worksheets.map(id => {
+    const ws = WORKSHEETS.find(w => w.id === id);
+    return ws ? ws.name : id;
+  }).join(', ') || 'Chưa có';
+
+  const body = `Chào ${displayName},
+
+Mình là Tia Nguyễn. Cám ơn bạn đã mua worksheet "${wsNames}" của mình!
+
+Để làm worksheet, bạn làm theo hướng dẫn nhé:
+URL: https://tiahere.com
+Username: ${username}
+Mật khẩu: ${password}
+
+Sau khi truy cập lần đầu tiên, hãy đổi mật khẩu để tăng tính bảo vệ cho tài khoản của bạn.
+
+Hãy liên hệ với mình qua Zalo: 0362 864 028
+
+Mình rất cám ơn và trân trọng bạn!
+Chúc những điều may mắn sẽ đến với bạn!
+
+Trân trọng,
+Tia Nguyễn
+
+---
+(Email này được gửi tự động - vui lòng không reply)`;
+
+  await fetch(EMAIL_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'sendWelcomeV3',
+      to: email,
+      subject: `Thông tin tài khoản Career Planning by Tia Nguyễn`,
+      body
+    })
+  });
+}
+
+// Create user
+window.openCreateUserModal = function() {
+  document.getElementById('ws-checkboxes').innerHTML = WORKSHEETS.map(ws =>
+    `<label style="display:flex;align-items:center;gap:.5rem;font-size:.88rem;cursor:pointer;">
+      <input type="checkbox" value="${ws.id}"> ${ws.icon} ${ws.name}
+    </label>`
+  ).join('');
+  ['new-display-name','new-email','new-username'].forEach(id => document.getElementById(id).value = '');
+  const msg = document.getElementById('create-user-msg');
+  msg.className = 'msg'; msg.style.display = 'none';
+  document.getElementById('modal-create-user').classList.add('open');
+};
+
+window.doCreateUser = async function() {
+  const displayName = document.getElementById('new-display-name').value.trim();
+  const email = document.getElementById('new-email').value.trim();
+  const username = document.getElementById('new-username').value.trim().toLowerCase();
+  const worksheets = [...document.querySelectorAll('#ws-checkboxes input:checked')].map(c => c.value);
+  const msg = document.getElementById('create-user-msg');
+  msg.className = 'msg'; msg.style.display = 'none';
+
+  if (!displayName || !email || !username) return showMsg(msg, 'err', 'Vui lòng điền đầy đủ.');
+
+  const password = generatePassword();
+
+  try {
+    showMsg(msg, 'ok', '⏳ Đang tạo tài khoản...');
+
+    const params = new URLSearchParams({
+      secret: SCRIPT_SECRET,
+      action: 'createUser',
+      displayName, email, username, password,
+      worksheets: worksheets.join(',')
+    });
+
+    const resp = await fetch(`${SCRIPT_V3_URL}?${params.toString()}`);
+    const result = await resp.json();
+
+    if (!result.success) {
+      showMsg(msg, 'err', 'Lỗi: ' + result.error);
+      return;
+    }
+
+    showMsg(msg, 'ok', `✅ Tạo thành công! Mật khẩu tạm: ${password}\nEmail đã được gửi cho ${email}`);
+    setTimeout(() => { closeModal('modal-create-user'); loadAdminData(); }, 3500);
+  } catch(e) {
+    showMsg(msg, 'err', 'Lỗi kết nối: ' + e.message);
+  }
+};
+
+// Assign worksheet
+window.openAssignModal = function(uid, username, currentWs) {
+  document.getElementById('assign-uid').value = uid;
+  document.getElementById('assign-username-label').textContent = username;
+  document.getElementById('assign-ws-checkboxes').innerHTML = WORKSHEETS.map(ws =>
+    `<label style="display:flex;align-items:center;gap:.5rem;font-size:.88rem;cursor:pointer;">
+      <input type="checkbox" value="${ws.id}" ${currentWs.includes(ws.id) ? 'checked' : ''}> ${ws.icon} ${ws.name}
+    </label>`
+  ).join('');
+  const msg = document.getElementById('assign-msg');
+  msg.className = 'msg'; msg.style.display = 'none';
+  document.getElementById('modal-assign-ws').classList.add('open');
+};
+
+window.doAssignWorksheet = async function() {
+  const uid = document.getElementById('assign-uid').value;
+  const worksheets = [...document.querySelectorAll('#assign-ws-checkboxes input:checked')].map(c => c.value);
+  const msg = document.getElementById('assign-msg');
+  try {
+    await updateDoc(doc(db, 'users_v3', uid), { worksheets });
+    showMsg(msg, 'ok', 'Đã cập nhật!');
+    setTimeout(() => { closeModal('modal-assign-ws'); loadAdminData(); }, 1000);
+  } catch(e) {
+    showMsg(msg, 'err', 'Lỗi: ' + e.message);
+  }
+};
+
+// Reset password
+window.openResetPwModal = function(uid, username) {
+  document.getElementById('reset-pw-uid').value = uid;
+  document.getElementById('reset-pw-username').textContent = username;
+  document.getElementById('reset-pw-value').value = '';
+  const msg = document.getElementById('reset-pw-msg');
+  msg.className = 'msg'; msg.style.display = 'none';
+  document.getElementById('modal-reset-pw').classList.add('open');
+};
+
+window.doResetPassword = async function() {
+  const uid = document.getElementById('reset-pw-uid').value;
+  const newPw = document.getElementById('reset-pw-value').value;
+  const msg = document.getElementById('reset-pw-msg');
+  if (newPw.length < 8) return showMsg(msg, 'err', 'Mật khẩu tối thiểu 8 ký tự.');
+
+  // Lấy email của user từ Firestore
+  try {
+    const snap = await getDoc(doc(db, 'users_v3', uid));
+    if (!snap.exists()) return showMsg(msg, 'err', 'Không tìm thấy user.');
+    const email = snap.data().email;
+
+    const params = new URLSearchParams({
+      secret: SCRIPT_SECRET,
+      action: 'resetPassword',
+      email, newPassword: newPw
+    });
+
+    const resp = await fetch(`${SCRIPT_V3_URL}?${params.toString()}`);
+    const result = await resp.json();
+    if (!result.success) return showMsg(msg, 'err', 'Lỗi: ' + result.error);
+    showMsg(msg, 'ok', 'Đặt lại mật khẩu thành công!');
+    setTimeout(() => closeModal('modal-reset-pw'), 1500);
+  } catch(e) {
+    showMsg(msg, 'err', 'Lỗi: ' + e.message);
+  }
+};
+
+// Toggle active
+window.toggleUserActive = async function(uid, currentlyActive) {
+  await updateDoc(doc(db, 'users_v3', uid), { active: !currentlyActive });
+  loadAdminData();
+};
+
+// ── FORGOT PASSWORD ─────────────────────────────────────
+window.showBuyModal = function() {
+  document.getElementById('modal-buy').classList.add('open');
+};
+
+window.showForgot = function() {
+  document.getElementById('forgot-email').value = '';
+  const msg = document.getElementById('forgot-msg');
+  msg.className = 'msg'; msg.style.display = 'none';
+  document.getElementById('modal-forgot').classList.add('open');
+};
+
+window.doForgotPassword = async function() {
+  const email = document.getElementById('forgot-email').value.trim();
+  const msg = document.getElementById('forgot-msg');
+  msg.className = 'msg'; msg.style.display = 'none';
+
+  if (!email) return showMsg(msg, 'err', 'Vui lòng nhập email.');
+
+  try {
+    // Kiểm tra email có trong users_v3 không
+    const q = query(collection(db, 'users_v3'), where('email', '==', email));
+    const snap = await getDocs(q);
+
+    if (snap.empty) {
+      showMsg(msg, 'err', 'Không tìm thấy email này trong hệ thống. Vui lòng liên hệ Tia Nguyễn qua Zalo 0362 864 028 để được hỗ trợ.');
+      return;
+    }
+
+    // Gửi email reset password
+    await sendPasswordResetEmail(auth, email);
+    showMsg(msg, 'ok', 'Đã gửi link đặt lại mật khẩu vào email của bạn. Vui lòng kiểm tra hộp thư (kể cả thư mục spam).');
+  } catch(e) {
+    showMsg(msg, 'err', 'Không tìm thấy email này trong hệ thống. Vui lòng liên hệ Zalo 0362 864 028 để được hỗ trợ.');
+  }
+};
+
+// ── UTILS ───────────────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  // Hiện/ẩn mobile tabbar
+  const tabbar = document.getElementById('mobile-tabbar');
+  if (tabbar) tabbar.style.display = name === 'app' ? 'flex' : 'none';
+}
+
+window.setMobileTab = function(tab) {
+  document.querySelectorAll('.mobile-tab').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById(`mob-tab-${tab}`);
+  if (el) el.classList.add('active');
+};
+
+function showMsg(el, type, text) {
+  el.className = 'msg ' + type;
+  el.textContent = text;
+  el.style.display = 'block';
+}
+
+window.closeModal = function(id) {
+  document.getElementById(id).classList.remove('open');
+};
+
+window.closeModalOutside = function(e, id) {
+  if (e.target === document.getElementById(id)) closeModal(id);
+};
+
+
+</script>
+</body>
+</html>
