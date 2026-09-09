@@ -531,6 +531,11 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
           <div class="hm-ai-loading" id="hm-ai-loading"><div class="hm-spinner"></div><p>Đang phân tích...</p></div>
           <div class="hm-ai-result" id="hm-ai-content" style="display:none"></div>
           <div class="hm-ai-error" id="hm-ai-error" style="display:none"></div>
+          <div id="hm-feedback-btn" style="display:none;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--hm-border);">
+            <button onclick="hmShowFeedback()" style="width:100%;background:transparent;border:1px solid var(--hm-accent);color:var(--hm-accent);padding:12px;border-radius:var(--hm-radius-sm);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;">
+              💬 Chia sẻ cảm nhận
+            </button>
+          </div>
         </div>
         <button class="hm-redo" onclick="hmReset()">Làm lại từ đầu</button>
       </div>
@@ -612,6 +617,24 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
   <button class="mobile-tab" id="mob-tab-logout" onclick="doLogout()" style="color:var(--rust);">
     <span class="tab-icon">↩</span>Đăng xuất
   </button>
+</div>
+
+<!-- ═══════════════ MODAL: CHIA SẺ CẢM NHẬN ═══════════════ -->
+<div class="modal-overlay" id="modal-feedback" onclick="closeModalOutside(event,'modal-feedback')">
+  <div class="modal-box" style="max-width:380px;text-align:center;">
+    <div style="font-size:2rem;margin-bottom:.75rem;">🌟</div>
+    <div class="modal-title" style="text-align:center;">Bản tổng hợp này có "wao" với bạn không?</div>
+    <p style="font-size:.88rem;color:var(--mid);line-height:1.65;margin-bottom:1.25rem;">
+      Chia sẻ cảm nhận với Tia Nguyễn tại Zalo 0362 864 028!
+    </p>
+    <a href="https://zalo.me/0362864028" target="_blank"
+      style="display:inline-flex;align-items:center;gap:.5rem;background:var(--teal);color:#fff;padding:.55rem 1.25rem;border-radius:2rem;font-size:.88rem;font-weight:500;text-decoration:none;margin-bottom:.75rem;">
+      Nhắn Zalo ngay
+    </a>
+    <div>
+      <button class="btn-sm ghost" onclick="closeModal('modal-feedback')" style="margin-top:.25rem;">Đóng</button>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════════════ MODAL: LIÊN HỆ MUA ═══════════════ -->
@@ -1032,6 +1055,7 @@ window.hmStartFromGuide = function() {
     document.getElementById('hm-ai-loading').style.display = 'none';
     document.getElementById('hm-ai-content').style.display = 'block';
     document.getElementById('hm-ai-content').innerHTML = savedResult;
+    document.getElementById('hm-feedback-btn').style.display = 'block';
   } else {
     hmInit();
   }
@@ -1191,6 +1215,7 @@ function hmShowResult() {
     document.getElementById('hm-ai-loading').style.display = 'none';
     document.getElementById('hm-ai-content').style.display = 'block';
     document.getElementById('hm-ai-content').innerHTML = savedResult;
+    document.getElementById('hm-feedback-btn').style.display = 'block';
   } else {
     hmCallAI();
   }
@@ -1257,6 +1282,7 @@ ${lines}`;
     const html = text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h3>$1</h3>').replace(/^# (.+)$/gm,'<h3>$1</h3>').replace(/^- (.+)$/gm,'<li>$1</li>').replace(/(<li>.*<\/li>\n?)+/g,m=>`<ul>${m}</ul>`).replace(/\n\n+/g,'</p><p>').split('\n').map(l=>l.startsWith('<')?l:(l.trim()?`<p>${l}</p>`:'')).join('');
     contentEl.innerHTML = html;
     localStorage.setItem('hm_ai_result', html);
+    document.getElementById('hm-feedback-btn').style.display = 'block';
   } catch(err) {
     loadEl.style.display = 'none'; errorEl.style.display = 'block';
     errorEl.innerHTML = `Không thể tải phân tích AI. Lỗi: ${err.message}<br><br><button onclick="hmCallAI()" style="background:none;border:1px solid currentColor;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;">Thử lại</button>`;
@@ -1269,6 +1295,10 @@ window.hmToggleSummary = function() {
   const isHidden = answers.style.display === 'none';
   answers.style.display = isHidden ? 'grid' : 'none';
   toggle.textContent = isHidden ? 'Thu gọn ▲' : 'Mở rộng ▼';
+};
+
+window.hmShowFeedback = function() {
+  document.getElementById('modal-feedback').classList.add('open');
 };
 
 window.hmReset = function() {
@@ -1481,7 +1511,7 @@ window.doCreateUser = async function() {
       worksheets: worksheets.join(',')
     });
 
-    const resp = await fetch(`${SCRIPT_V3_URL}?${params.toString()}`);
+    const resp = await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`);
     const result = await resp.json();
 
     if (!result.success) {
@@ -1551,7 +1581,7 @@ window.doResetPassword = async function() {
       email, newPassword: newPw
     });
 
-    const resp = await fetch(`${SCRIPT_V3_URL}?${params.toString()}`);
+    const resp = await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`);
     const result = await resp.json();
     if (!result.success) return showMsg(msg, 'err', 'Lỗi: ' + result.error);
     showMsg(msg, 'ok', 'Đặt lại mật khẩu thành công!');
