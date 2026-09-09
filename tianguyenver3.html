@@ -658,13 +658,12 @@ import { getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, collection, quer
 
 // ── CONFIG - ĐIỀN FIREBASE CONFIG CỦA BẠN VÀO ĐÂY ──────
 const firebaseConfig = {
-  apiKey: "AIzaSyBenqf2Shl_sjL774gIOiar8MuESBWzlNg",
-  authDomain: "tiahere-ver3.firebaseapp.com",
-  projectId: "tiahere-ver3",
-  storageBucket: "tiahere-ver3.firebasestorage.app",
-  messagingSenderId: "784374505843",
-  appId: "1:784374505843:web:ce79ad8915fae3c69be506",
-  measurementId: "G-J838L8PHBT"
+  apiKey: "PASTE_API_KEY",
+  authDomain: "PASTE_AUTH_DOMAIN",
+  projectId: "PASTE_PROJECT_ID",
+  storageBucket: "PASTE_STORAGE_BUCKET",
+  messagingSenderId: "PASTE_SENDER_ID",
+  appId: "PASTE_APP_ID"
 };
 
 // Danh sách worksheet có trong hệ thống
@@ -1210,7 +1209,6 @@ ${lines}`;
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         secret: SCRIPT_SECRET,
-        action: 'callAI',
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 2000,
         messages: [{ role: 'user', content: prompt }]
@@ -1355,8 +1353,8 @@ window.switchAdminTab = function(tab) {
 };
 
 // Apps Script Ver3 endpoint - điền URL sau khi deploy
-const SCRIPT_V3_URL = 'https://script.google.com/macros/s/AKfycbxyKGu2yLvJjWei2vhqZ_r3P65NtuiiFGdKOJlxaOf9uIk_P_XitYbQRrIysUjGrC5P/exec';
-const SCRIPT_SECRET = 'tia_1991_oJ2nO1dY';
+const SCRIPT_V3_URL = 'PASTE_APPS_SCRIPT_V3_URL_HERE';
+const SCRIPT_SECRET = 'PASTE_YOUR_SECRET_TOKEN_HERE';
 
 // Generate mật khẩu ngẫu nhiên
 function generatePassword() {
