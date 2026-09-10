@@ -512,9 +512,9 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
         <div class="hm-result-card">
           <h2 style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="hmToggleSummary()">
             Tóm tắt 30 lựa chọn
-            <span id="hm-summary-toggle" style="font-size:13px;font-weight:400;color:var(--hm-ink-light);">Thu gọn ▲</span>
+            <span id="hm-summary-toggle" style="font-size:13px;font-weight:400;color:var(--hm-ink-light);">Mở rộng ▼</span>
           </h2>
-          <div class="hm-answers" id="hm-answers"></div>
+          <div class="hm-answers" id="hm-answers" style="display:none"></div>
         </div>
         <div class="hm-result-card">
           <h2>AI hỗ trợ tổng hợp và gợi ý</h2>
@@ -1286,7 +1286,7 @@ ${lines}`;
       body: JSON.stringify({
         secret: SCRIPT_SECRET,
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 2000,
+        max_tokens: 3200,
         messages: [{ role: 'user', content: prompt }]
       })
     });
