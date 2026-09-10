@@ -1296,8 +1296,7 @@ async function hmTrackResultView(aiResult) {
     const ref = doc(db, 'users_v3', user.uid);
     const snap = await getDoc(ref);
     if (!snap.exists()) return;
-    const data = snap.data();
-    const existing = data.worksheet_hieu_minh || {};
+    const existing = (snap.data().worksheet_hieu_minh) || {};
     const now = new Date().toISOString();
 
     // Giữ tối đa 3 session gần nhất
@@ -1305,13 +1304,12 @@ async function hmTrackResultView(aiResult) {
     sessions.push({ date: now, aiResult: aiResult || '' });
     if (sessions.length > 3) sessions.shift();
 
+    // Dùng dot notation để không ghi đè field answers
     await updateDoc(ref, {
-      worksheet_hieu_minh: {
-        completedAt: existing.completedAt || now,
-        lastViewedAt: now,
-        viewCount: (existing.viewCount || 0) + 1,
-        sessions
-      }
+      'worksheet_hieu_minh.completedAt': existing.completedAt || now,
+      'worksheet_hieu_minh.lastViewedAt': now,
+      'worksheet_hieu_minh.viewCount': (existing.viewCount || 0) + 1,
+      'worksheet_hieu_minh.sessions': sessions
     });
   } catch(e) {
     console.log('Track error:', e.message);
@@ -1362,6 +1360,7 @@ window.hmCallAI = async function() {
 Lưu ý quan trọng:
 - Mỗi câu có phần "Xác minh" là ví dụ thực tế từ trải nghiệm của người dùng. Hãy ưu tiên dùng những thông tin này để cá nhân hóa phân tích - phản chiếu lại những gì họ viết để họ thấy bạn thực sự đọc và hiểu họ.
 - Viết hoàn toàn bằng tiếng Việt. Nếu bắt buộc dùng thuật ngữ tiếng Anh chuyên ngành, hãy giải thích nghĩa tiếng Việt ngay phía sau trong ngoặc đơn.
+- Chỉ viết đúng 7 phần theo cấu trúc bên dưới, không thêm bất kỳ phần nào khác ngoài 7 phần này.
 
 Bản phân tích gồm 7 phần, viết tiếng Việt, thân thiện, ngắn gọn, cụ thể:
 
