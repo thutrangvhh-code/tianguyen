@@ -225,7 +225,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 
 <!-- ═══════════════ NAV ═══════════════ -->
 <nav class="nav" id="main-nav">
-  <a class="nav-logo" href="#">Tia Nguyễn ✦</a>
+  <a class="nav-logo" href="#"><img src="Logo_tianguyen.png" alt="Tia Nguyễn" style="height:40px;width:auto;display:block;"></a>
 </nav>
 
 <!-- ═══════════════ PAGE: LOGIN ═══════════════ -->
@@ -492,7 +492,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
             </div>
             <div style="display:flex;align-items:flex-start;gap:14px;">
               <span style="background:var(--hm-accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:2px;">5</span>
-              <p style="font-size:15px;color:var(--hm-ink);line-height:1.65;margin:0;">Mỗi khi cần xác định lại bản thân, hãy quay lại làm worksheet này.</p>
+              <p style="font-size:15px;color:var(--hm-ink);line-height:1.65;margin:0;">Mỗi khi đứng trước bước ngoặt sự nghiệp (mệt mỏi, kiệt sức, chán nản, muốn nghỉ việc/nhảy việc, đổi hướng công việc), hãy quay lại làm worksheet này.</p>
             </div>
           </div>
           <div style="display:flex;gap:12px;">
@@ -842,11 +842,9 @@ function renderApp(forceUserView = false) {
   renderWorksheetGrid(d.worksheets || []);
 
   if (isAdmin && !forceUserView) {
-    showPage('admin');
     loadAdminData();
-  } else {
-    showPage('app');
   }
+  handleRoute(user);
 }
 
 function renderWorksheetGrid(assignedIds) {
@@ -976,11 +974,14 @@ window.openWorksheet = function(id, name) {
   }
   document.getElementById('ws-viewer').classList.add('open');
   document.body.style.overflow = 'hidden';
+  // Cập nhật URL hash
+  history.pushState(null, '', '#worksheet' + id.replace(/-/g, ''));
 };
 
 window.closeViewer = function() {
   document.getElementById('ws-viewer').classList.remove('open');
   document.body.style.overflow = '';
+  history.pushState(null, '', '#worksheet');
 };
 
 // ── WORKSHEET HIỂU MÌNH JS ──────────────────────────────
@@ -1356,11 +1357,16 @@ window.switchToAdminView = function() {
   showPage('admin');
 };
 
-window.switchTab = function(tab) {
+window.switchTab = function(tab, updateHash = true) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sidebar-nav-item').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
   document.getElementById('nav-' + tab).classList.add('active');
+  // Cập nhật URL hash
+  if (updateHash) {
+    const hashMap = { worksheet: '#worksheet', docs: '#documents', password: '#profile' };
+    history.pushState(null, '', hashMap[tab] || '#trangcanhan');
+  }
 };
 
 // ── ĐỔI MẬT KHẨU ───────────────────────────────────────
@@ -1761,11 +1767,14 @@ window.doForgotPassword = async function() {
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
-  // Hiện mobile tabbar chỉ khi màn hình nhỏ
   const tabbar = document.getElementById('mobile-tabbar');
   if (tabbar) {
     tabbar.style.display = (name === 'app' && window.innerWidth <= 700) ? 'flex' : 'none';
   }
+  // Cập nhật URL hash
+  if (name === 'login') history.replaceState(null, '', '#');
+  else if (name === 'app') history.pushState(null, '', '#trangcanhan');
+  else if (name === 'admin') history.pushState(null, '', '#admin');
 }
 
 window.setMobileTab = function(tab) {
@@ -1779,6 +1788,39 @@ function showMsg(el, type, text) {
   el.textContent = text;
   el.style.display = 'block';
 }
+
+// ── URL ROUTING ──────────────────────────────────────────
+function handleRoute(user) {
+  const hash = window.location.hash;
+  if (!user) {
+    // Chưa đăng nhập → luôn về login
+    showPage('login');
+    return;
+  }
+  const isAdmin = user.email === ADMIN_EMAIL;
+  if (hash === '#admin') {
+    if (isAdmin) showPage('admin');
+    else { showPage('app'); switchTab('worksheet', false); }
+  } else if (hash === '#documents') {
+    showPage('app'); switchTab('docs', false);
+  } else if (hash === '#profile') {
+    showPage('app'); switchTab('password', false);
+  } else if (hash === '#worksheethieuminh') {
+    showPage('app');
+    switchTab('worksheet', false);
+    setTimeout(() => openWorksheet('hieu-minh', 'Hiểu Mình'), 100);
+  } else if (hash === '#worksheet' || hash === '#trangcanhan' || hash === '') {
+    showPage('app'); switchTab('worksheet', false);
+  } else {
+    showPage('app'); switchTab('worksheet', false);
+  }
+}
+
+// Xử lý nút Back/Forward của browser
+window.addEventListener('popstate', () => {
+  const user = auth.currentUser;
+  handleRoute(user);
+});
 
 window.closeModal = function(id) {
   document.getElementById(id).classList.remove('open');
