@@ -1038,14 +1038,16 @@ function hmInitGuide() {
   document.getElementById('ws-viewer-content').scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-window.hmStartFromGuide = function() {
+window.hmStartFromGuide = async function() {
   document.getElementById('hm-guide').style.display = 'none';
-  const savedResult = localStorage.getItem('hm_ai_result');
-  const answers = JSON.parse(localStorage.getItem('hm_answers') || '{}');
+
+  // Load từ Firestore trước, localStorage là backup
+  const fsData = await hmLoadFromFirestore();
+  const savedResult = (fsData && fsData.aiResult) || localStorage.getItem('hm_ai_result');
+  const answers = (fsData && fsData.answers) || JSON.parse(localStorage.getItem('hm_answers') || '{}');
   const answeredCount = Object.keys(answers).filter(k => answers[k]?.choice).length;
 
   if (savedResult && answeredCount === 30) {
-    // Đã có kết quả → mở thẳng trang kết quả
     hmAnswers = answers;
     hmRenderQuestions();
     document.getElementById('hm-main').style.display = 'none';
@@ -1061,15 +1063,24 @@ window.hmStartFromGuide = function() {
     document.getElementById('hm-ai-content').style.display = 'block';
     document.getElementById('hm-ai-content').innerHTML = savedResult;
     document.getElementById('hm-feedback-btn').style.display = 'block';
+    // Sync localStorage
+    localStorage.setItem('hm_answers', JSON.stringify(answers));
+    localStorage.setItem('hm_ai_result', savedResult);
   } else {
     hmInit();
   }
 };
 
-function hmInit() {
-  const saved = localStorage.getItem('hm_answers');
-  if (saved) { try { hmAnswers = JSON.parse(saved); } catch(e) {} }
-  // Reset về câu hỏi nếu chưa xem kết quả
+async function hmInit() {
+  // Load từ Firestore trước, localStorage là backup
+  const fsData = await hmLoadFromFirestore();
+  if (fsData && fsData.answers) {
+    hmAnswers = fsData.answers;
+    localStorage.setItem('hm_answers', JSON.stringify(hmAnswers));
+  } else {
+    const saved = localStorage.getItem('hm_answers');
+    if (saved) { try { hmAnswers = JSON.parse(saved); } catch(e) {} }
+  }
   document.getElementById('hm-result').style.display = 'none';
   document.getElementById('hm-main').style.display = 'block';
   document.getElementById('hm-progress').style.display = 'block';
@@ -1138,6 +1149,7 @@ window.hmSelect = function(qi, ch) {
   if (!hmAnswers[qi]) hmAnswers[qi] = { choice: null, verify: ['','',''] };
   hmAnswers[qi].choice = ch;
   localStorage.setItem('hm_answers', JSON.stringify(hmAnswers));
+  hmScheduleSave();
   document.querySelectorAll(`#hm-q-${qi} .hm-choice`).forEach(b => {
     b.classList.remove('sel-A','sel-B');
     if (b.dataset.ch === ch) b.classList.add(`sel-${ch}`);
@@ -1151,6 +1163,7 @@ window.hmVerifyInput = function(qi, vi) {
   hmAnswers[qi].verify[vi] = el.value;
   el.classList.toggle('filled', el.value.trim().length > 0);
   localStorage.setItem('hm_answers', JSON.stringify(hmAnswers));
+  hmScheduleSave();
 };
 
 function hmShowQuestion(idx) {
@@ -1201,6 +1214,46 @@ function hmShowIncompleteModal(incomplete) {
 window.hmGoToQ = function(idx) { hmCloseModal(); hmCurrent = idx; hmShowQuestion(idx); };
 window.hmCloseModal = function() { document.getElementById('hm-incomplete-modal').classList.remove('show'); };
 window.hmCloseModalOutside = function(e) { if (e.target === document.getElementById('hm-incomplete-modal')) hmCloseModal(); };
+
+// ── FIRESTORE SYNC CHO WORKSHEET ─────────────────────────
+let hmSaveTimer = null;
+async function hmSaveAnswersToFirestore() {
+  try {
+    const user = auth.currentUser;
+    if (!user) return;
+    const ref = doc(db, 'users_v3', user.uid);
+    await updateDoc(ref, {
+      'worksheet_hieu_minh.answers': JSON.stringify(hmAnswers)
+    });
+  } catch(e) {
+    console.log('Save answers error:', e.message);
+  }
+}
+
+function hmScheduleSave() {
+  // Debounce 2s - tránh gọi Firestore quá nhiều khi user đang nhập
+  clearTimeout(hmSaveTimer);
+  hmSaveTimer = setTimeout(hmSaveAnswersToFirestore, 2000);
+}
+
+async function hmLoadFromFirestore() {
+  try {
+    const user = auth.currentUser;
+    if (!user) return null;
+    const snap = await getDoc(doc(db, 'users_v3', user.uid));
+    if (!snap.exists()) return null;
+    const wdata = snap.data().worksheet_hieu_minh || {};
+    return {
+      answers: wdata.answers ? JSON.parse(wdata.answers) : null,
+      aiResult: wdata.sessions && wdata.sessions.length > 0
+        ? wdata.sessions[wdata.sessions.length - 1].aiResult
+        : null
+    };
+  } catch(e) {
+    console.log('Load answers error:', e.message);
+    return null;
+  }
+}
 
 // Lưu thống kê xem kết quả vào Firestore
 async function hmTrackResultView(aiResult) {
@@ -1340,11 +1393,20 @@ window.hmShowFeedback = function() {
   document.getElementById('modal-feedback').classList.add('open');
 };
 
-window.hmReset = function() {
+window.hmReset = async function() {
   if (!confirm('Bạn có chắc muốn làm lại từ đầu? Tất cả câu trả lời sẽ bị xóa.')) return;
   localStorage.removeItem('hm_answers');
   localStorage.removeItem('hm_ai_result');
   hmAnswers = {}; hmCurrent = 0;
+  // Xóa answers trên Firestore
+  try {
+    const user = auth.currentUser;
+    if (user) {
+      await updateDoc(doc(db, 'users_v3', user.uid), {
+        'worksheet_hieu_minh.answers': null
+      });
+    }
+  } catch(e) { console.log('Reset Firestore error:', e.message); }
   document.getElementById('hm-result').style.display = 'none';
   document.getElementById('hm-main').style.display = 'none';
   document.getElementById('hm-progress').style.display = 'none';
