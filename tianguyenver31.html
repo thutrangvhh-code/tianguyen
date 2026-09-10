@@ -1196,7 +1196,7 @@ window.hmCloseModal = function() { document.getElementById('hm-incomplete-modal'
 window.hmCloseModalOutside = function(e) { if (e.target === document.getElementById('hm-incomplete-modal')) hmCloseModal(); };
 
 // Lưu thống kê xem kết quả vào Firestore
-async function hmTrackResultView() {
+async function hmTrackResultView(aiResult) {
   try {
     const user = auth.currentUser;
     if (!user) return;
@@ -1206,11 +1206,18 @@ async function hmTrackResultView() {
     const data = snap.data();
     const existing = data.worksheet_hieu_minh || {};
     const now = new Date().toISOString();
+
+    // Giữ tối đa 3 session gần nhất
+    const sessions = existing.sessions || [];
+    sessions.push({ date: now, aiResult: aiResult || '' });
+    if (sessions.length > 3) sessions.shift();
+
     await updateDoc(ref, {
       worksheet_hieu_minh: {
         completedAt: existing.completedAt || now,
         lastViewedAt: now,
-        viewCount: (existing.viewCount || 0) + 1
+        viewCount: (existing.viewCount || 0) + 1,
+        sessions
       }
     });
   } catch(e) {
@@ -1230,9 +1237,6 @@ function hmShowResult() {
     return `<div class="hm-chip ch-${ch}"><div class="hm-chip-q">Câu ${i+1}</div><div class="hm-chip-a">${ch}: ${label}</div></div>`;
   }).join('');
 
-  // Lưu thống kê vào Firestore
-  hmTrackResultView();
-
   // Kiểm tra đã có kết quả AI lưu chưa
   const savedResult = localStorage.getItem('hm_ai_result');
   if (savedResult) {
@@ -1240,6 +1244,8 @@ function hmShowResult() {
     document.getElementById('hm-ai-content').style.display = 'block';
     document.getElementById('hm-ai-content').innerHTML = savedResult;
     document.getElementById('hm-feedback-btn').style.display = 'block';
+    // Lưu thống kê vào Firestore (kết quả từ cache)
+    hmTrackResultView(savedResult);
   } else {
     hmCallAI();
   }
@@ -1307,6 +1313,8 @@ ${lines}`;
     contentEl.innerHTML = html;
     localStorage.setItem('hm_ai_result', html);
     document.getElementById('hm-feedback-btn').style.display = 'block';
+    // Lưu thống kê vào Firestore (kết quả AI mới)
+    hmTrackResultView(html);
   } catch(err) {
     loadEl.style.display = 'none'; errorEl.style.display = 'block';
     errorEl.innerHTML = `Không thể tải phân tích AI. Lỗi: ${err.message}<br><br><button onclick="hmCallAI()" style="background:none;border:1px solid currentColor;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;">Thử lại</button>`;
@@ -1433,8 +1441,9 @@ function renderWorksheetAdminTable(users) {
       const firstView = wdata.completedAt ? new Date(wdata.completedAt).toLocaleDateString('vi-VN') : '-';
       const lastView = wdata.lastViewedAt ? new Date(wdata.lastViewedAt).toLocaleDateString('vi-VN') : '-';
       const viewCount = wdata.viewCount || 0;
+      const hasSessions = wdata.sessions && wdata.sessions.length > 0;
       return `<tr>
-        <td><strong>${u.displayName || '-'}</strong></td>
+        <td><strong style="cursor:${hasSessions?'pointer':'default'};color:${hasSessions?'var(--teal)':'inherit'}" onclick="${hasSessions?`openWsDetailModal('${u.uid}','${u.displayName||u.username}','${ws.id}')`:''}">${u.displayName || '-'}${hasSessions?' ↗':''}</strong></td>
         <td style="color:var(--mid)">${u.username || '-'}</td>
         <td>${firstView}</td>
         <td>${lastView}</td>
@@ -1462,6 +1471,65 @@ function renderWorksheetAdminTable(users) {
     </div>`;
   }).join('');
 }
+
+// Modal xem chi tiết kết quả worksheet của thành viên
+window.openWsDetailModal = async function(uid, name, wsId) {
+  // Tạo modal nếu chưa có
+  let modal = document.getElementById('modal-ws-detail');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'modal-ws-detail';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+      <div class="modal-box" style="max-width:720px;max-height:85vh;overflow-y:auto;">
+        <div class="modal-title" id="ws-detail-title"></div>
+        <div id="ws-detail-content"></div>
+        <div style="margin-top:1.5rem;text-align:right">
+          <button class="btn-sm ghost" onclick="closeModal('modal-ws-detail')">Đóng</button>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+  }
+
+  document.getElementById('ws-detail-title').textContent = `Kết quả worksheet - ${name}`;
+  document.getElementById('ws-detail-content').innerHTML = '<p style="color:var(--mid);text-align:center;padding:2rem">Đang tải...</p>';
+  modal.classList.add('open');
+
+  try {
+    const snap = await getDoc(doc(db, 'users_v3', uid));
+    if (!snap.exists()) throw new Error('Không tìm thấy user');
+    const wdata = snap.data().worksheet_hieu_minh || {};
+    const sessions = wdata.sessions || [];
+
+    const statsHtml = `
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;">
+        <div style="flex:1;min-width:140px;background:var(--cream);border-radius:10px;padding:1rem;text-align:center;">
+          <div style="font-size:.75rem;color:var(--mid);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Lần đầu xem</div>
+          <div style="font-weight:600">${wdata.completedAt ? new Date(wdata.completedAt).toLocaleDateString('vi-VN') : '-'}</div>
+        </div>
+        <div style="flex:1;min-width:140px;background:var(--cream);border-radius:10px;padding:1rem;text-align:center;">
+          <div style="font-size:.75rem;color:var(--mid);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Lần gần nhất</div>
+          <div style="font-weight:600">${wdata.lastViewedAt ? new Date(wdata.lastViewedAt).toLocaleDateString('vi-VN') : '-'}</div>
+        </div>
+        <div style="flex:1;min-width:140px;background:var(--cream);border-radius:10px;padding:1rem;text-align:center;">
+          <div style="font-size:.75rem;color:var(--mid);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Tổng số lần xem</div>
+          <div style="font-weight:600;color:var(--teal)">${wdata.viewCount || 0} lần</div>
+        </div>
+      </div>`;
+
+    const sessionsHtml = sessions.length ? sessions.slice().reverse().map((s, i) => `
+      <div style="margin-bottom:1.5rem;border:0.5px solid rgba(44,40,32,.1);border-radius:10px;overflow:hidden;">
+        <div style="background:var(--cream);padding:.75rem 1rem;font-size:.82rem;font-weight:600;color:var(--mid);">
+          Lần ${sessions.length - i} - ${new Date(s.date).toLocaleDateString('vi-VN', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}
+        </div>
+        <div style="padding:1rem;font-size:.88rem;line-height:1.7;color:var(--dark)">${s.aiResult || '<em>Không có nội dung</em>'}</div>
+      </div>`).join('') : '<p style="color:var(--mid);text-align:center;padding:1rem">Chưa có kết quả nào được lưu.</p>';
+
+    document.getElementById('ws-detail-content').innerHTML = statsHtml + sessionsHtml;
+  } catch(e) {
+    document.getElementById('ws-detail-content').innerHTML = `<p style="color:red">Lỗi: ${e.message}</p>`;
+  }
+};
 
 window.switchAdminTab = function(tab) {
   document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
