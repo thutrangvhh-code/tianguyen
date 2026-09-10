@@ -225,7 +225,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 
 <!-- ═══════════════ NAV ═══════════════ -->
 <nav class="nav" id="main-nav">
-  <a class="nav-logo" href="#"><img src="Logo_tianguyen.png" alt="Tia Nguyễn" style="height:40px;width:auto;display:block;"></a>
+  <a class="nav-logo" href="#"><img src="Logo_tianguyen.png" alt="Tia Nguyễn" style="height:80px;width:auto;display:block;"></a>
 </nav>
 
 <!-- ═══════════════ PAGE: LOGIN ═══════════════ -->
@@ -844,7 +844,7 @@ function renderApp(forceUserView = false) {
   if (isAdmin && !forceUserView) {
     loadAdminData();
   }
-  handleRoute(user);
+  handleRoute(auth.currentUser);
 }
 
 function renderWorksheetGrid(assignedIds) {
