@@ -40,6 +40,9 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 .field label{display:block;font-size:.8rem;font-weight:500;color:var(--mid);margin-bottom:.3rem;}
 .field input{width:100%;padding:.55rem .8rem;border:1px solid rgba(44,40,32,.15);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;background:var(--cream);color:var(--dark);outline:none;transition:border .2s;}
 .field input:focus{border-color:var(--teal);}
+.pw-wrap{position:relative;}
+.pw-wrap input{padding-right:2.5rem;}
+.pw-toggle{position:absolute;right:.7rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--mid);font-size:1rem;padding:0;line-height:1;}
 .btn-full{width:100%;padding:.65rem;background:var(--teal);color:var(--white);border:none;border-radius:2rem;font-size:.92rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;}
 .btn-full:hover{background:var(--teal-light);}
 .auth-msg{font-size:.83rem;padding:.45rem .7rem;border-radius:6px;margin-top:.65rem;display:none;}
@@ -225,7 +228,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 
 <!-- ═══════════════ NAV ═══════════════ -->
 <nav class="nav" id="main-nav">
-  <a class="nav-logo" href="#"><img src="Logo_tianguyen.png" alt="Tia Nguyễn" style="height:80px;width:auto;display:block;"></a>
+  <a class="nav-logo" href="#"><img src="Logo_tianguyen.png" alt="Tia Nguyễn" style="height:120px;width:auto;display:block;"></a>
 </nav>
 
 <!-- ═══════════════ PAGE: LOGIN ═══════════════ -->
@@ -240,7 +243,10 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
       </div>
       <div class="field">
         <label>Mật khẩu</label>
-        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+        <div class="pw-wrap">
+          <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+          <button class="pw-toggle" onclick="togglePwVisibility('login-password', this)" tabindex="-1">👁</button>
+        </div>
         <span class="forgot-link" onclick="showForgot()">Quên mật khẩu?</span>
       </div>
       <div class="auth-msg" id="login-msg"></div>
@@ -1788,6 +1794,17 @@ function showMsg(el, type, text) {
   el.textContent = text;
   el.style.display = 'block';
 }
+
+window.togglePwVisibility = function(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁';
+  }
+};
 
 // ── URL ROUTING ──────────────────────────────────────────
 function handleRoute(user) {
