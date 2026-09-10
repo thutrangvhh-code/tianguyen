@@ -476,15 +476,23 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
           <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:36px;">
             <div style="display:flex;align-items:flex-start;gap:14px;">
               <span style="background:var(--hm-accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:2px;">1</span>
-              <p style="font-size:15px;color:var(--hm-ink);line-height:1.65;margin:0;">Chọn đáp án cho từng câu hỏi.</p>
+              <p style="font-size:15px;color:var(--hm-ink);line-height:1.65;margin:0;">Dành 30' tập trung để hoàn thiện worksheet này nhé, bạn sẽ nhận được kết quả khiến bản thân phải "WAO"!</p>
             </div>
             <div style="display:flex;align-items:flex-start;gap:14px;">
               <span style="background:var(--hm-accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:2px;">2</span>
-              <p style="font-size:15px;color:var(--hm-ink);line-height:1.65;margin:0;">Nếu gặp câu hỏi chưa chắc chắn về đáp án, bạn có thể bỏ qua và quay lại làm trước khi "xem kết quả".</p>
+              <p style="font-size:15px;color:var(--hm-ink);line-height:1.65;margin:0;">Chọn đáp án cho từng câu hỏi.</p>
             </div>
             <div style="display:flex;align-items:flex-start;gap:14px;">
               <span style="background:var(--hm-accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:2px;">3</span>
+              <p style="font-size:15px;color:var(--hm-ink);line-height:1.65;margin:0;">Nếu gặp câu hỏi chưa chắc chắn về đáp án, bạn có thể bỏ qua và quay lại làm trước khi "xem kết quả".</p>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:14px;">
+              <span style="background:var(--hm-accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:2px;">4</span>
               <p style="font-size:15px;color:var(--hm-ink);line-height:1.65;margin:0;">Cố gắng trả lời các câu hỏi xác minh để xác thực đáp án bạn chọn. Bạn càng trả lời các câu hỏi xác minh, thì bản phân tích tổng hợp càng chính xác và đầy đủ.</p>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:14px;">
+              <span style="background:var(--hm-accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:2px;">5</span>
+              <p style="font-size:15px;color:var(--hm-ink);line-height:1.65;margin:0;">Mỗi khi cần xác định lại bản thân, hãy quay lại làm worksheet này.</p>
             </div>
           </div>
           <div style="display:flex;gap:12px;">
@@ -1323,10 +1331,11 @@ window.hmReset = function() {
   localStorage.removeItem('hm_ai_result');
   hmAnswers = {}; hmCurrent = 0;
   document.getElementById('hm-result').style.display = 'none';
-  document.getElementById('hm-main').style.display = 'block';
-  document.getElementById('hm-progress').style.display = 'block';
-  document.getElementById('hm-nav').style.display = 'flex';
-  hmRenderQuestions(); hmShowQuestion(0);
+  document.getElementById('hm-main').style.display = 'none';
+  document.getElementById('hm-progress').style.display = 'none';
+  document.getElementById('hm-nav').style.display = 'none';
+  document.getElementById('hm-guide').style.display = 'block';
+  document.getElementById('ws-viewer-content').scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 // ── TABS ────────────────────────────────────────────────
