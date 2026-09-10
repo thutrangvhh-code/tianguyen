@@ -1028,14 +1028,47 @@ const HM_API_KEY = ''; // Không dùng nữa - gọi qua Apps Script proxy
 let hmCurrent = 0;
 let hmAnswers = {};
 
-function hmInitGuide() {
-  // Hiện trang hướng dẫn, ẩn các phần khác
-  document.getElementById('hm-guide').style.display = 'block';
-  document.getElementById('hm-progress').style.display = 'none';
-  document.getElementById('hm-main').style.display = 'none';
-  document.getElementById('hm-result').style.display = 'none';
-  document.getElementById('hm-nav').style.display = 'none';
+async function hmInitGuide() {
   document.getElementById('ws-viewer-content').scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Kiểm tra Firestore trước
+  const fsData = await hmLoadFromFirestore();
+  const savedResult = (fsData && fsData.aiResult) || localStorage.getItem('hm_ai_result');
+  const answers = (fsData && fsData.answers) || JSON.parse(localStorage.getItem('hm_answers') || '{}');
+  const answeredCount = Object.keys(answers).filter(k => answers[k]?.choice).length;
+
+  if (savedResult && answeredCount === 30) {
+    // Đã có kết quả → hiện thẳng trang kết quả
+    hmAnswers = answers;
+    hmRenderQuestions();
+    document.getElementById('hm-guide').style.display = 'none';
+    document.getElementById('hm-progress').style.display = 'none';
+    document.getElementById('hm-main').style.display = 'none';
+    document.getElementById('hm-nav').style.display = 'none';
+    document.getElementById('hm-result').style.display = 'block';
+    document.getElementById('hm-answers').innerHTML = HM_QUESTIONS.map((q, i) => {
+      const a = hmAnswers[i]; const ch = a?.choice || '?';
+      const label = ch === 'A' ? q.A.main : (ch === 'B' ? q.B.main : '?');
+      return `<div class="hm-chip ch-${ch}"><div class="hm-chip-q">Câu ${i+1}</div><div class="hm-chip-a">${ch}: ${label}</div></div>`;
+    }).join('');
+    document.getElementById('hm-ai-loading').style.display = 'none';
+    document.getElementById('hm-ai-content').style.display = 'block';
+    document.getElementById('hm-ai-content').innerHTML = savedResult;
+    document.getElementById('hm-feedback-btn').style.display = 'block';
+    localStorage.setItem('hm_answers', JSON.stringify(answers));
+    localStorage.setItem('hm_ai_result', savedResult);
+  } else if (answeredCount > 0) {
+    // Đang làm dở → vào thẳng worksheet
+    document.getElementById('hm-guide').style.display = 'none';
+    hmInit();
+  } else {
+    // Chưa bắt đầu → hiện hướng dẫn
+    document.getElementById('hm-guide').style.display = 'block';
+    document.getElementById('hm-progress').style.display = 'none';
+    document.getElementById('hm-main').style.display = 'none';
+    document.getElementById('hm-result').style.display = 'none';
+    document.getElementById('hm-nav').style.display = 'none';
+  }
 }
 
 window.hmStartFromGuide = async function() {
@@ -1326,27 +1359,32 @@ window.hmCallAI = async function() {
 
   const prompt = `Bạn là chuyên gia tư vấn career người Việt của Career Planning by Tia Nguyễn. Dựa trên 30 câu trả lời và ví dụ xác minh thực tế của người dùng, hãy tổng hợp thành bản phân tích profile sự nghiệp ngắn gọn, thực tế và cá nhân hóa.
 
-Lưu ý quan trọng: Mỗi câu có phần "Xác minh" là ví dụ thực tế từ trải nghiệm của người dùng. Hãy ưu tiên dùng những thông tin này để cá nhân hóa phân tích - phản chiếu lại những gì họ viết để họ thấy bạn thực sự đọc và hiểu họ.
+Lưu ý quan trọng:
+- Mỗi câu có phần "Xác minh" là ví dụ thực tế từ trải nghiệm của người dùng. Hãy ưu tiên dùng những thông tin này để cá nhân hóa phân tích - phản chiếu lại những gì họ viết để họ thấy bạn thực sự đọc và hiểu họ.
+- Viết hoàn toàn bằng tiếng Việt. Nếu bắt buộc dùng thuật ngữ tiếng Anh chuyên ngành, hãy giải thích nghĩa tiếng Việt ngay phía sau trong ngoặc đơn.
 
-Bản phân tích gồm 5 phần, viết tiếng Việt, thân thiện, ngắn gọn, cụ thể:
+Bản phân tích gồm 7 phần, viết tiếng Việt, thân thiện, ngắn gọn, cụ thể:
 
 **1. Cách bạn vận hành**
 Tổng hợp cách người này làm việc tốt nhất: nhịp độ, phong cách, điều kiện để phát huy tốt nhất. Dùng ví dụ xác minh của họ để minh họa. (3-5 câu)
 
 **2. Giá trị và động lực**
-Điều gì thực sự quan trọng với họ, họ được thúc đẩy bởi điều gì, muốn tạo ra loại impact nào. Dùng ví dụ xác minh của họ để minh họa. (3-5 câu)
+Điều gì thực sự quan trọng với họ, họ được thúc đẩy bởi điều gì, muốn tạo ra loại tác động nào. Dùng ví dụ xác minh của họ để minh họa. (3-5 câu)
 
 **3. Điểm mạnh nổi bật cần khai thác**
-Dựa trên pattern câu trả lời, chỉ ra 2-3 điểm mạnh cụ thể của người này trong thị trường lao động - không phải "bạn giỏi gì" mà là "thị trường đang cần gì từ người như bạn". (3-5 câu)
+Dựa trên xu hướng câu trả lời, chỉ ra 2-3 điểm mạnh cụ thể của người này trong thị trường lao động - không phải "bạn giỏi gì" mà là "thị trường đang cần gì từ người như bạn". (3-5 câu)
 
 **4. Môi trường phù hợp và cần tránh**
 Gợi ý cụ thể loại tổ chức, văn hóa, vai trò và 3-5 hướng đi phù hợp nhất. Đồng thời chỉ ra 1-2 loại môi trường người này nên tránh và lý do tại sao. (4-6 câu)
 
-**5. Rủi ro cần lưu ý**
-Dựa trên combination câu trả lời, chỉ ra 1-2 điểm người này dễ bị đặt sai vị trí hoặc dễ burn out nếu không chú ý. Cụ thể và thực tế, không chung chung. (2-3 câu)
+**5. Ngành và lĩnh vực phù hợp**
+Dựa trên toàn bộ profile, gợi ý 3-5 ngành hoặc lĩnh vực cụ thể phù hợp với người này. Với mỗi ngành, giải thích ngắn gọn tại sao phù hợp dựa trên đặc điểm của họ. Không liệt kê chung chung - cần cụ thể và có lý do rõ ràng. (5-8 câu)
 
-**6. Câu mô tả bản thân**
-Gợi ý 1-2 câu ngắn người dùng có thể dùng để giới thiệu bản thân trong phỏng vấn hoặc với mentor - dựa trên đúng profile của họ, không phải template chung.
+**6. Rủi ro cần lưu ý**
+Dựa trên tổng hợp câu trả lời, chỉ ra 1-2 điểm người này dễ bị đặt sai vị trí hoặc dễ kiệt sức nếu không chú ý. Cụ thể và thực tế, không chung chung. (2-3 câu)
+
+**7. Câu mô tả bản thân**
+Gợi ý 1-2 câu ngắn người dùng có thể dùng để giới thiệu bản thân trong phỏng vấn hoặc với người cố vấn - dựa trên đúng profile của họ, không phải mẫu câu chung.
 
 ---
 DỮ LIỆU 30 CÂU TRẢ LỜI:
@@ -1360,7 +1398,7 @@ ${lines}`;
       body: JSON.stringify({
         secret: SCRIPT_SECRET,
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 3200,
+        max_tokens: 4000,
         messages: [{ role: 'user', content: prompt }]
       })
     });
