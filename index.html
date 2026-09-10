@@ -122,7 +122,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 /* ══════════════════════════════
    ADMIN PAGE
 ══════════════════════════════ */
-.admin-wrap{max-width:1100px;margin:0 auto;padding:2rem 1.5rem 4rem;}
+.admin-wrap{max-width:1400px;margin:0 auto;padding:2rem 1.5rem 4rem;}
 .admin-page-title{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--dark);margin-bottom:1.5rem;}
 .admin-tabs{display:flex;gap:.5rem;margin-bottom:1.5rem;border-bottom:1px solid rgba(44,40,32,.1);padding-bottom:0;}
 .admin-tab-btn{background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--mid);padding:.5rem 1rem;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
@@ -228,7 +228,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 
 <!-- ═══════════════ NAV ═══════════════ -->
 <nav class="nav" id="main-nav">
-  <a class="nav-logo" href="#"><img src="Logo_tianguyen.png" alt="Tia Nguyễn" style="height:120px;width:auto;display:block;"></a>
+  <a class="nav-logo" href="#"><img src="Logo_tianguyen.png" alt="Tia Nguyễn" style="height:70px;width:auto;display:block;"></a>
 </nav>
 
 <!-- ═══════════════ PAGE: LOGIN ═══════════════ -->
@@ -263,6 +263,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
       <div class="sidebar-avatar" id="sidebar-avatar">T</div>
       <div class="sidebar-name" id="sidebar-name">Thành viên</div>
       <div class="sidebar-username" id="sidebar-username">@username</div>
+      <div id="trial-banner" style="display:none;background:#FEF3E8;color:#B07D2A;font-size:.78rem;padding:.5rem .75rem;border-radius:8px;margin-bottom:.75rem;text-align:center;"></div>
       <nav class="sidebar-nav">
         <button class="sidebar-nav-item active" onclick="switchTab('worksheet')" id="nav-worksheet">
           <span class="icon">📋</span> Worksheet
@@ -364,6 +365,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
               <th>Tên</th>
               <th>Email</th>
               <th>Worksheet</th>
+              <th>Loại TK</th>
               <th>Trạng thái</th>
               <th></th>
             </tr>
@@ -377,6 +379,14 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 
     <!-- Worksheets panel -->
     <div class="admin-panel" id="admin-panel-worksheets">
+      <div class="admin-section" style="margin-bottom:1.25rem">
+        <div class="admin-section-header">
+          <span class="admin-section-title">⚙️ Cấu hình link đăng ký</span>
+        </div>
+        <div id="ws-form-config" style="display:flex;flex-direction:column;gap:.75rem;padding:.5rem 0;"></div>
+        <button class="btn-sm" onclick="saveWsFormConfig()" style="margin-top:.5rem;">Lưu cấu hình</button>
+        <div id="ws-config-msg" style="font-size:.82rem;margin-top:.5rem;"></div>
+      </div>
       <div id="ws-admin-panels"></div>
     </div>
   </div>
@@ -582,6 +592,17 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
       🔑 Mật khẩu tạm sẽ được tự động tạo và gửi vào email của thành viên.
     </div>
     <div class="field">
+      <label>Loại tài khoản</label>
+      <div style="display:flex;gap:.75rem;margin-top:.25rem;">
+        <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.88rem;">
+          <input type="radio" name="access-type" value="trial" checked> Trial (7 ngày)
+        </label>
+        <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.88rem;">
+          <input type="radio" name="access-type" value="paid"> Paid (không giới hạn)
+        </label>
+      </div>
+    </div>
+    <div class="field">
       <label>Worksheet được cấp</label>
       <div id="ws-checkboxes" style="display:flex;flex-direction:column;gap:.5rem;margin-top:.25rem;"></div>
     </div>
@@ -645,13 +666,13 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 <div class="modal-overlay" id="modal-buy" onclick="closeModalOutside(event,'modal-buy')">
   <div class="modal-box" style="max-width:360px;text-align:center;">
     <div style="font-size:2rem;margin-bottom:.75rem;">🛒</div>
-    <div class="modal-title" style="text-align:center;">Mua worksheet</div>
-    <p style="font-size:.88rem;color:var(--mid);line-height:1.65;margin-bottom:1.25rem;">
-      Vui lòng liên hệ Zalo <strong>0362 864 028</strong> để mua nhanh.
+    <div class="modal-title" style="text-align:center;" id="modal-buy-title">Mua worksheet</div>
+    <p style="font-size:.88rem;color:var(--mid);line-height:1.65;margin-bottom:1.25rem;" id="modal-buy-desc">
+      Đăng ký để truy cập worksheet này.
     </p>
-    <a href="https://zalo.me/0362864028" target="_blank"
+    <a id="modal-buy-btn" href="#" target="_blank"
       style="display:inline-flex;align-items:center;gap:.5rem;background:var(--teal);color:#fff;padding:.55rem 1.25rem;border-radius:2rem;font-size:.88rem;font-weight:500;text-decoration:none;margin-bottom:.75rem;">
-      Nhắn Zalo ngay
+      Đăng ký ngay
     </a>
     <div>
       <button class="btn-sm ghost" onclick="closeModal('modal-buy')" style="margin-top:.25rem;">Đóng</button>
@@ -833,7 +854,12 @@ window.doLogout = async function() {
 };
 
 // ── RENDER APP ──────────────────────────────────────────
-function renderApp(forceUserView = false) {
+async function renderApp(forceUserView = false) {
+  // Reload data mới nhất từ Firestore
+  if (currentUser) {
+    const snap = await getDoc(doc(db, 'users_v3', currentUser.uid));
+    if (snap.exists()) currentUserData = snap.data();
+  }
   const d = currentUserData;
   const isAdmin = d.username === ADMIN_USERNAME;
 
@@ -846,6 +872,22 @@ function renderApp(forceUserView = false) {
   if (btnBackAdmin) btnBackAdmin.style.display = isAdmin ? 'flex' : 'none';
 
   renderWorksheetGrid(d.worksheets || []);
+
+  // Hiện banner trial nếu còn hạn
+  const trialBanner = document.getElementById('trial-banner');
+  if (trialBanner) {
+    if (d.accessType === 'trial' && d.expiresAt) {
+      const daysLeft = Math.ceil((new Date(d.expiresAt) - new Date()) / (1000 * 60 * 60 * 24));
+      if (daysLeft > 0) {
+        trialBanner.style.display = 'block';
+        trialBanner.textContent = `⏳ Tài khoản dùng thử - còn ${daysLeft} ngày`;
+      } else {
+        trialBanner.style.display = 'none';
+      }
+    } else {
+      trialBanner.style.display = 'none';
+    }
+  }
 
   if (isAdmin && !forceUserView) {
     loadAdminData();
@@ -881,13 +923,13 @@ function renderWorksheetGrid(assignedIds) {
       statusColor = '#B07D2A';
       statusBg = '#FEF3E8';
       btnLabel = 'Đặt trước →';
-      btnAction = `window.showBuyModal()`;
+      btnAction = `window.showBuyModal('${ws.id}')`;
     } else if (!owned) {
       statusLabel = 'Liên hệ mua';
       statusColor = 'var(--rust)';
       statusBg = 'var(--rust-pale)';
       btnLabel = 'Liên hệ mua →';
-      btnAction = `window.showBuyModal()`;
+      btnAction = `window.showBuyModal('${ws.id}')`;
     } else if (aiResult) {
       statusLabel = 'Đã hoàn thành';
       statusColor = '#2e7d32';
@@ -1431,11 +1473,41 @@ window.hmShowFeedback = function() {
 };
 
 window.hmReset = async function() {
+  // Kiểm tra trial hết hạn
+  const d = currentUserData;
+  if (d.accessType === 'trial' && d.expiresAt) {
+    const daysLeft = Math.ceil((new Date(d.expiresAt) - new Date()) / (1000 * 60 * 60 * 24));
+    if (daysLeft <= 0) {
+      // Hết hạn → hiện popup
+      const snap = await getDoc(doc(db, 'config', 'worksheets'));
+      const formUrl = snap.exists() && snap.data()['hieu-minh']?.formUrl;
+      const modal = document.createElement('div');
+      modal.className = 'modal-overlay open';
+      modal.innerHTML = `
+        <div class="modal-box" style="max-width:380px;text-align:center;">
+          <div style="font-size:2rem;margin-bottom:.75rem;">🔒</div>
+          <div class="modal-title" style="text-align:center;">Tài khoản dùng thử đã hết hạn</div>
+          <p style="font-size:.88rem;color:var(--mid);line-height:1.65;margin-bottom:1.25rem;">
+            Bạn vẫn có thể xem lại kết quả đã lưu, nhưng cần nâng cấp để làm lại worksheet.
+          </p>
+          ${formUrl ? `<a href="${formUrl}" target="_blank"
+            style="display:inline-flex;align-items:center;gap:.5rem;background:var(--teal);color:#fff;padding:.55rem 1.25rem;border-radius:2rem;font-size:.88rem;font-weight:500;text-decoration:none;margin-bottom:.75rem;">
+            Đăng ký ngay →
+          </a>` : `<a href="https://zalo.me/0362864028" target="_blank"
+            style="display:inline-flex;align-items:center;gap:.5rem;background:var(--teal);color:#fff;padding:.55rem 1.25rem;border-radius:2rem;font-size:.88rem;font-weight:500;text-decoration:none;margin-bottom:.75rem;">
+            Nhắn Zalo ngay
+          </a>`}
+          <div><button class="btn-sm ghost" onclick="this.closest('.modal-overlay').remove()">Đóng</button></div>
+        </div>`;
+      document.body.appendChild(modal);
+      return;
+    }
+  }
+
   if (!confirm('Bạn có chắc muốn làm lại từ đầu? Tất cả câu trả lời sẽ bị xóa.')) return;
   localStorage.removeItem('hm_answers');
   localStorage.removeItem('hm_ai_result');
   hmAnswers = {}; hmCurrent = 0;
-  // Xóa answers trên Firestore
   try {
     const user = auth.currentUser;
     if (user) {
@@ -1521,7 +1593,31 @@ function renderUsersTable(users) {
     tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--light);padding:1.5rem;">Chưa có thành viên nào.</td></tr>';
     return;
   }
-  tbody.innerHTML = users.map(u => `
+  tbody.innerHTML = users.map(u => {
+    // Tính trạng thái trial/paid
+    const now = new Date();
+    let accessBadge = '';
+    let accessBtn = '';
+    if (!u.accessType) {
+      accessBadge = `<span class="badge grey">Chưa set</span>`;
+      accessBtn = `
+        <button class="btn-sm ghost" onclick="setAccessType('${u.uid}','trial')">Set Trial</button>
+        <button class="btn-sm ghost" onclick="setAccessType('${u.uid}','paid')">Set Paid</button>`;
+    } else if (u.accessType === 'paid') {
+      accessBadge = `<span class="badge green">Paid</span>`;
+      accessBtn = '';
+    } else if (u.accessType === 'trial') {
+      const expires = u.expiresAt ? new Date(u.expiresAt) : null;
+      const daysLeft = expires ? Math.ceil((expires - now) / (1000 * 60 * 60 * 24)) : null;
+      if (daysLeft === null || daysLeft <= 0) {
+        accessBadge = `<span class="badge grey">Trial - Hết hạn</span>`;
+      } else {
+        accessBadge = `<span class="badge" style="background:#FEF3E8;color:#B07D2A">Trial - còn ${daysLeft} ngày</span>`;
+      }
+      accessBtn = `<button class="btn-sm ghost" onclick="setAccessType('${u.uid}','paid')">Nâng cấp Paid</button>`;
+    }
+
+    return `
     <tr>
       <td><strong>${u.username}</strong></td>
       <td>${u.displayName || '-'}</td>
@@ -1530,16 +1626,18 @@ function renderUsersTable(users) {
         const ws = WORKSHEETS.find(w => w.id === id);
         return ws ? `<span class="badge green">${ws.name}</span> ` : '';
       }).join('') || '<span style="color:var(--light);font-size:.8rem">Chưa có</span>'}</td>
+      <td>${accessBadge}</td>
       <td><span class="badge ${u.active !== false ? 'green' : 'grey'}">${u.active !== false ? 'Hoạt động' : 'Tạm dừng'}</span></td>
       <td>
-        <div style="display:flex;gap:.4rem;">
+        <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
           <button class="btn-sm ghost" onclick="openAssignModal('${u.uid}','${u.username}',${JSON.stringify(u.worksheets||[])})">Worksheet</button>
           <button class="btn-sm ghost" onclick="openResetPwModal('${u.uid}','${u.username}')">Reset PW</button>
           <button class="btn-sm ${u.active !== false ? 'danger' : ''} ghost" onclick="toggleUserActive('${u.uid}',${u.active !== false})">${u.active !== false ? 'Tạm dừng' : 'Kích hoạt'}</button>
+          ${accessBtn}
         </div>
       </td>
-    </tr>
-  `).join('');
+    </tr>`;
+  }).join('');
 }
 
 function renderWorksheetAdminTable(users) {
@@ -1648,12 +1746,13 @@ window.switchAdminTab = function(tab) {
   document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
   document.querySelector(`.admin-tab-btn[onclick="switchAdminTab('${tab}')"]`).classList.add('active');
   document.getElementById(`admin-panel-${tab}`).classList.add('active');
+  if (tab === 'worksheets') loadWsFormConfig();
 };
 
 // Apps Script Ver3 endpoint - điền URL sau khi deploy
 const SCRIPT_V3_URL = 'https://tiahere-ai-proxy.thutrang-vhh.workers.dev';
 const SCRIPT_SECRET = 'tia_1988_OJ2nj1di';
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxTfB6QnfPZSi5UphzyRTirCnLu_pxZMKLhVTLNbcBT0twY_3XwBXzlatH2b9NRERBl/exec';  // dùng cho createUser, resetPassword
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-M8FVxvdd4QEXgSw8fo9GH9cYg14C6CBkUKKxvu7DKK9layzZz9xn3dulFaH8dQZW/exec';  // dùng cho createUser, resetPassword
 const EMAIL_SCRIPT_URL = APPS_SCRIPT_URL;  // alias - dùng cho sendWelcomeEmail
 
 // Generate mật khẩu ngẫu nhiên
@@ -1728,6 +1827,7 @@ window.doCreateUser = async function() {
   const email = document.getElementById('new-email').value.trim();
   const username = document.getElementById('new-username').value.trim().toLowerCase();
   const worksheets = [...document.querySelectorAll('#ws-checkboxes input:checked')].map(c => c.value);
+  const accessType = document.querySelector('input[name="access-type"]:checked')?.value || 'trial';
   const msg = document.getElementById('create-user-msg');
   msg.className = 'msg'; msg.style.display = 'none';
 
@@ -1742,7 +1842,8 @@ window.doCreateUser = async function() {
       secret: SCRIPT_SECRET,
       action: 'createUser',
       displayName, email, username, password,
-      worksheets: worksheets.join(',')
+      worksheets: worksheets.join(','),
+      accessType
     });
 
     const resp = await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`);
@@ -1752,6 +1853,14 @@ window.doCreateUser = async function() {
       showMsg(msg, 'err', 'Lỗi: ' + result.error);
       return;
     }
+
+    // Lưu accessType và expiresAt vào Firestore
+    const uid = result.uid;
+    const now = new Date();
+    const expiresAt = accessType === 'trial'
+      ? new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString()
+      : null;
+    await updateDoc(doc(db, 'users_v3', uid), { accessType, expiresAt });
 
     showMsg(msg, 'ok', `✅ Tạo thành công! Mật khẩu tạm: ${password}\nEmail đã được gửi cho ${email}`);
     setTimeout(() => { closeModal('modal-create-user'); loadAdminData(); }, 3500);
@@ -1832,8 +1941,31 @@ window.toggleUserActive = async function(uid, currentlyActive) {
 };
 
 // ── FORGOT PASSWORD ─────────────────────────────────────
-window.showBuyModal = function() {
-  document.getElementById('modal-buy').classList.add('open');
+window.showBuyModal = async function(wsId) {
+  const modal = document.getElementById('modal-buy');
+  const btn = document.getElementById('modal-buy-btn');
+  const desc = document.getElementById('modal-buy-desc');
+
+  // Load link form từ Firestore
+  try {
+    const snap = await getDoc(doc(db, 'config', 'worksheets'));
+    const formUrl = snap.exists() && snap.data()[wsId]?.formUrl;
+    if (formUrl) {
+      btn.href = formUrl;
+      btn.textContent = 'Đăng ký ngay';
+      desc.textContent = 'Điền form đăng ký để truy cập worksheet này.';
+    } else {
+      btn.href = 'https://zalo.me/0362864028';
+      btn.textContent = 'Nhắn Zalo ngay';
+      desc.innerHTML = 'Vui lòng liên hệ Zalo <strong>0362 864 028</strong> để mua nhanh.';
+    }
+  } catch(e) {
+    btn.href = 'https://zalo.me/0362864028';
+    btn.textContent = 'Nhắn Zalo ngay';
+    desc.innerHTML = 'Vui lòng liên hệ Zalo <strong>0362 864 028</strong> để mua nhanh.';
+  }
+
+  modal.classList.add('open');
 };
 
 window.showForgot = function() {
@@ -1902,6 +2034,57 @@ window.togglePwVisibility = function(inputId, btn) {
   } else {
     input.type = 'password';
     btn.textContent = '👁';
+  }
+};
+
+// Set Trial/Paid cho thành viên
+window.setAccessType = async function(uid, type) {
+  try {
+    const now = new Date();
+    const expiresAt = type === 'trial'
+      ? new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString()
+      : null;
+    await updateDoc(doc(db, 'users_v3', uid), { accessType: type, expiresAt });
+    loadAdminData();
+  } catch(e) {
+    alert('Lỗi: ' + e.message);
+  }
+};
+
+// ── WORKSHEET FORM CONFIG ─────────────────────────────────
+async function loadWsFormConfig() {
+  const container = document.getElementById('ws-form-config');
+  if (!container) return;
+  try {
+    const snap = await getDoc(doc(db, 'config', 'worksheets'));
+    const data = snap.exists() ? snap.data() : {};
+    container.innerHTML = WORKSHEETS.map(ws => `
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+        <label style="font-size:.85rem;font-weight:500;min-width:200px;">${ws.icon} ${ws.name}</label>
+        <input id="form-url-${ws.id}" type="url" placeholder="https://forms.google.com/..."
+          value="${data[ws.id]?.formUrl || ''}"
+          style="flex:1;min-width:280px;padding:.45rem .75rem;border:1px solid rgba(44,40,32,.15);border-radius:8px;font-size:.85rem;background:var(--cream);color:var(--dark);">
+      </div>`).join('');
+  } catch(e) {
+    console.log('Load config error:', e.message);
+  }
+}
+
+window.saveWsFormConfig = async function() {
+  const msg = document.getElementById('ws-config-msg');
+  try {
+    const data = {};
+    WORKSHEETS.forEach(ws => {
+      const val = document.getElementById(`form-url-${ws.id}`)?.value.trim();
+      if (val) data[ws.id] = { formUrl: val };
+    });
+    await setDoc(doc(db, 'config', 'worksheets'), data);
+    msg.style.color = 'var(--teal)';
+    msg.textContent = '✓ Đã lưu cấu hình thành công!';
+    setTimeout(() => msg.textContent = '', 3000);
+  } catch(e) {
+    msg.style.color = 'var(--rust)';
+    msg.textContent = 'Lỗi: ' + e.message;
   }
 };
 
