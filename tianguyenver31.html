@@ -1442,8 +1442,9 @@ function renderWorksheetAdminTable(users) {
       const lastView = wdata.lastViewedAt ? new Date(wdata.lastViewedAt).toLocaleDateString('vi-VN') : '-';
       const viewCount = wdata.viewCount || 0;
       const hasSessions = wdata.sessions && wdata.sessions.length > 0;
+      const hasAnyData = wdata.viewCount > 0;
       return `<tr>
-        <td><strong style="cursor:${hasSessions?'pointer':'default'};color:${hasSessions?'var(--teal)':'inherit'}" onclick="${hasSessions?`openWsDetailModal('${u.uid}','${u.displayName||u.username}','${ws.id}')`:''}">${u.displayName || '-'}${hasSessions?' ↗':''}</strong></td>
+        <td><strong style="cursor:${hasAnyData?'pointer':'default'};color:${hasAnyData?'var(--teal)':'inherit'}" onclick="${hasAnyData?`openWsDetailModal('${u.uid}','${u.displayName||u.username}','${ws.id}')`:''}">${u.displayName || '-'}${hasAnyData?' ↗':''}</strong></td>
         <td style="color:var(--mid)">${u.username || '-'}</td>
         <td>${firstView}</td>
         <td>${lastView}</td>
