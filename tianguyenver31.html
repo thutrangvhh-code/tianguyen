@@ -119,7 +119,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 /* ══════════════════════════════
    ADMIN PAGE
 ══════════════════════════════ */
-.admin-wrap{max-width:860px;margin:0 auto;padding:2rem 1.5rem 4rem;}
+.admin-wrap{max-width:1100px;margin:0 auto;padding:2rem 1.5rem 4rem;}
 .admin-page-title{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--dark);margin-bottom:1.5rem;}
 .admin-tabs{display:flex;gap:.5rem;margin-bottom:1.5rem;border-bottom:1px solid rgba(44,40,32,.1);padding-bottom:0;}
 .admin-tab-btn{background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--mid);padding:.5rem 1rem;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
@@ -371,17 +371,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 
     <!-- Worksheets panel -->
     <div class="admin-panel" id="admin-panel-worksheets">
-      <div class="admin-section">
-        <div class="admin-section-header">
-          <span class="admin-section-title">Danh sách worksheet</span>
-        </div>
-        <table class="admin-table">
-          <thead>
-            <tr><th>ID</th><th>Tên worksheet</th><th>Số thành viên có access</th></tr>
-          </thead>
-          <tbody id="ws-admin-tbody"></tbody>
-        </table>
-      </div>
+      <div id="ws-admin-panels"></div>
     </div>
   </div>
 </div>
@@ -1197,6 +1187,29 @@ window.hmGoToQ = function(idx) { hmCloseModal(); hmCurrent = idx; hmShowQuestion
 window.hmCloseModal = function() { document.getElementById('hm-incomplete-modal').classList.remove('show'); };
 window.hmCloseModalOutside = function(e) { if (e.target === document.getElementById('hm-incomplete-modal')) hmCloseModal(); };
 
+// Lưu thống kê xem kết quả vào Firestore
+async function hmTrackResultView() {
+  try {
+    const user = auth.currentUser;
+    if (!user) return;
+    const ref = doc(db, 'users_v3', user.uid);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+    const data = snap.data();
+    const existing = data.worksheet_hieu_minh || {};
+    const now = new Date().toISOString();
+    await updateDoc(ref, {
+      worksheet_hieu_minh: {
+        completedAt: existing.completedAt || now,
+        lastViewedAt: now,
+        viewCount: (existing.viewCount || 0) + 1
+      }
+    });
+  } catch(e) {
+    console.log('Track error:', e.message);
+  }
+}
+
 function hmShowResult() {
   document.getElementById('hm-main').style.display = 'none';
   document.getElementById('hm-progress').style.display = 'none';
@@ -1208,6 +1221,9 @@ function hmShowResult() {
     const label = ch === 'A' ? q.A.main : (ch === 'B' ? q.B.main : '?');
     return `<div class="hm-chip ch-${ch}"><div class="hm-chip-q">Câu ${i+1}</div><div class="hm-chip-a">${ch}: ${label}</div></div>`;
   }).join('');
+
+  // Lưu thống kê vào Firestore
+  hmTrackResultView();
 
   // Kiểm tra đã có kết quả AI lưu chưa
   const savedResult = localStorage.getItem('hm_ai_result');
@@ -1399,14 +1415,42 @@ function renderUsersTable(users) {
 }
 
 function renderWorksheetAdminTable(users) {
-  const tbody = document.getElementById('ws-admin-tbody');
-  tbody.innerHTML = WORKSHEETS.map(ws => {
-    const count = users.filter(u => (u.worksheets||[]).includes(ws.id)).length;
-    return `<tr>
-      <td><code style="font-size:.8rem">${ws.id}</code></td>
-      <td>${ws.icon} ${ws.name}</td>
-      <td>${count} thành viên</td>
-    </tr>`;
+  const container = document.getElementById('ws-admin-panels');
+  container.innerHTML = WORKSHEETS.map(ws => {
+    const members = users.filter(u => (u.worksheets||[]).includes(ws.id));
+    const completed = members.filter(u => u.worksheet_hieu_minh?.viewCount > 0);
+    const rows = members.map(u => {
+      const wdata = ws.id === 'hieu-minh' ? (u.worksheet_hieu_minh || {}) : {};
+      const firstView = wdata.completedAt ? new Date(wdata.completedAt).toLocaleDateString('vi-VN') : '-';
+      const lastView = wdata.lastViewedAt ? new Date(wdata.lastViewedAt).toLocaleDateString('vi-VN') : '-';
+      const viewCount = wdata.viewCount || 0;
+      return `<tr>
+        <td><strong>${u.displayName || '-'}</strong></td>
+        <td style="color:var(--mid)">${u.username || '-'}</td>
+        <td>${firstView}</td>
+        <td>${lastView}</td>
+        <td style="text-align:center">${viewCount > 0 ? `<span style="background:var(--teal);color:#fff;border-radius:20px;padding:2px 10px;font-size:.8rem">${viewCount} lần</span>` : '<span style="color:var(--mid);font-size:.85rem">Chưa xem</span>'}</td>
+      </tr>`;
+    }).join('');
+
+    return `<div class="admin-section" style="margin-bottom:1.25rem">
+      <div class="admin-section-header">
+        <span class="admin-section-title">${ws.icon} ${ws.name}</span>
+        <span style="font-size:.82rem;color:var(--mid)">${completed.length}/${members.length} đã xem kết quả</span>
+      </div>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Tên</th>
+            <th>Username</th>
+            <th>Lần đầu xem</th>
+            <th>Lần gần nhất</th>
+            <th style="text-align:center">Số lần xem</th>
+          </tr>
+        </thead>
+        <tbody>${members.length ? rows : '<tr><td colspan="5" style="text-align:center;color:var(--mid);padding:1rem">Chưa có thành viên nào</td></tr>'}</tbody>
+      </table>
+    </div>`;
   }).join('');
 }
 
