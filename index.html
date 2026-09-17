@@ -1038,15 +1038,6 @@ async function renderApp(forceUserView = false) {
 
 function renderWorksheetGrid(assignedIds) {
   const grid = document.getElementById('ws-grid');
-  if (!assignedIds.length) {
-    grid.innerHTML = `
-      <div class="ws-empty">
-        <div class="ws-empty-icon">📋</div>
-        <div class="ws-empty-title">Chưa có worksheet nào</div>
-        <div class="ws-empty-desc">Liên hệ Tia Nguyễn để được cấp quyền truy cập worksheet.</div>
-      </div>`;
-    return;
-  }
 
   grid.innerHTML = WORKSHEETS.map(ws => {
     const owned = assignedIds.includes(ws.id);
