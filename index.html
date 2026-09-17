@@ -224,6 +224,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 .mobile-tab-admin{color:var(--rust)!important;}
 
 </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -473,6 +474,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
     <div class="admin-tabs">
       <button class="admin-tab-btn active" onclick="switchAdminTab('users')">Thành viên</button>
       <button class="admin-tab-btn" onclick="switchAdminTab('worksheets')">Worksheet</button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('stats')">Thống kê</button>
     </div>
 
     <!-- Users panel -->
@@ -512,6 +514,39 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
         <div id="ws-config-msg" style="font-size:.82rem;margin-top:.5rem;"></div>
       </div>
       <div id="ws-admin-panels"></div>
+    </div>
+
+    <!-- Stats panel -->
+    <div class="admin-panel" id="admin-panel-stats">
+      <div class="admin-section">
+        <!-- Stat cards -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem;" id="stats-cards"></div>
+
+        <!-- Biểu đồ đăng ký theo ngày -->
+        <div style="background:var(--white);border-radius:14px;padding:1.25rem;margin-bottom:1.25rem;border:0.5px solid rgba(44,40,32,.08);">
+          <div style="font-weight:600;font-size:.95rem;margin-bottom:1rem;color:var(--dark);">📅 Đăng ký theo ngày (30 ngày gần nhất)</div>
+          <canvas id="chart-daily" height="80"></canvas>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;">
+          <!-- Độ tuổi -->
+          <div style="background:var(--white);border-radius:14px;padding:1.25rem;border:0.5px solid rgba(44,40,32,.08);">
+            <div style="font-weight:600;font-size:.95rem;margin-bottom:1rem;color:var(--dark);">🎂 Độ tuổi</div>
+            <canvas id="chart-age" height="160"></canvas>
+          </div>
+          <!-- Giới tính -->
+          <div style="background:var(--white);border-radius:14px;padding:1.25rem;border:0.5px solid rgba(44,40,32,.08);">
+            <div style="font-weight:600;font-size:.95rem;margin-bottom:1rem;color:var(--dark);">👤 Giới tính</div>
+            <div id="stats-gender" style="display:flex;flex-direction:column;gap:.75rem;margin-top:.5rem;"></div>
+          </div>
+        </div>
+
+        <!-- Khu vực -->
+        <div style="background:var(--white);border-radius:14px;padding:1.25rem;border:0.5px solid rgba(44,40,32,.08);">
+          <div style="font-weight:600;font-size:.95rem;margin-bottom:1rem;color:var(--dark);">📍 Top khu vực</div>
+          <div id="stats-region"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1910,6 +1945,7 @@ window.switchAdminTab = function(tab) {
   document.querySelector(`.admin-tab-btn[onclick="switchAdminTab('${tab}')"]`).classList.add('active');
   document.getElementById(`admin-panel-${tab}`).classList.add('active');
   if (tab === 'worksheets') loadWsFormConfig();
+  if (tab === 'stats') loadStats();
 };
 
 // Apps Script Ver3 endpoint - điền URL sau khi deploy
@@ -2303,6 +2339,125 @@ window.setAccessType = async function(uid, type) {
     alert('Lỗi: ' + e.message);
   }
 };
+
+// ── THỐNG KÊ ─────────────────────────────────────────────
+let chartDaily = null, chartAge = null;
+
+async function loadStats() {
+  try {
+    const snap = await getDocs(collection(db, 'users_v3'));
+    const users = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    // Stat cards
+    const total = users.length;
+    const selfReg = users.filter(u => u.selfRegistered).length;
+    const adminCreated = total - selfReg;
+    const paid = users.filter(u => u.accessType === 'paid').length;
+
+    document.getElementById('stats-cards').innerHTML = [
+      { label: 'Tổng thành viên', value: total, icon: '👥' },
+      { label: 'Tự đăng ký', value: selfReg, icon: '✍️' },
+      { label: 'Admin tạo', value: adminCreated, icon: '🔑' },
+      { label: 'Paid', value: paid, icon: '💳' },
+    ].map(c => `
+      <div style="background:var(--white);border-radius:14px;padding:1.25rem;border:0.5px solid rgba(44,40,32,.08);text-align:center;">
+        <div style="font-size:1.75rem;margin-bottom:.4rem;">${c.icon}</div>
+        <div style="font-size:2rem;font-weight:700;color:var(--dark);">${c.value}</div>
+        <div style="font-size:.8rem;color:var(--mid);margin-top:.2rem;">${c.label}</div>
+      </div>`).join('');
+
+    // Biểu đồ theo ngày - 30 ngày gần nhất
+    const days = [];
+    const counts = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      days.push(dateStr.slice(5)); // MM-DD
+      counts.push(users.filter(u => {
+        const reg = u.registeredAt || u.createdAt || '';
+        return reg.startsWith(dateStr);
+      }).length);
+    }
+
+    const ctxDaily = document.getElementById('chart-daily').getContext('2d');
+    if (chartDaily) chartDaily.destroy();
+    chartDaily = new Chart(ctxDaily, {
+      type: 'line',
+      data: {
+        labels: days,
+        datasets: [{ label: 'Đăng ký', data: counts, borderColor: '#2E7D6F', backgroundColor: 'rgba(46,125,111,.1)', tension: 0.3, fill: true }]
+      },
+      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+    });
+
+    // Độ tuổi
+    const ageMap = { 'under18': 'Dưới 18', '18-22': '18-22', '23-27': '23-27', '28-35': '28-35', '36+': '36+' };
+    const ageCounts = Object.keys(ageMap).map(k => users.filter(u => u.age === k).length);
+    const ctxAge = document.getElementById('chart-age').getContext('2d');
+    if (chartAge) chartAge.destroy();
+    chartAge = new Chart(ctxAge, {
+      type: 'bar',
+      data: {
+        labels: Object.values(ageMap),
+        datasets: [{ data: ageCounts, backgroundColor: ['#4CAF50','#2196F3','#FF9800','#9C27B0','#F44336'] }]
+      },
+      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+    });
+
+    // Giới tính
+    const genderMap = { male: 'Nam', female: 'Nữ', other: 'Không muốn trả lời' };
+    const genderTotal = users.length || 1;
+    document.getElementById('stats-gender').innerHTML = Object.entries(genderMap).map(([k, label]) => {
+      const count = users.filter(u => u.gender === k).length;
+      const pct = Math.round(count / genderTotal * 100);
+      return `
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:.3rem;">
+            <span>${label}</span><span style="font-weight:600;">${count} (${pct}%)</span>
+          </div>
+          <div style="background:rgba(44,40,32,.08);border-radius:99px;height:8px;">
+            <div style="background:var(--teal);width:${pct}%;height:8px;border-radius:99px;transition:.3s;"></div>
+          </div>
+        </div>`;
+    }).join('');
+
+    // Khu vực - top 10
+    const regionCount = {};
+    users.forEach(u => { if (u.region) regionCount[u.region] = (regionCount[u.region] || 0) + 1; });
+    const regionLabels = {
+      HN:'Hà Nội', HCM:'TP. Hồ Chí Minh', DN:'Đà Nẵng', HP:'Hải Phòng', CT:'Cần Thơ',
+      AG:'An Giang', BRV:'Bà Rịa - Vũng Tàu', BG:'Bắc Giang', BK:'Bắc Kạn', BL:'Bạc Liêu',
+      BN:'Bắc Ninh', BT:'Bến Tre', BD:'Bình Định', BDU:'Bình Dương', BP:'Bình Phước',
+      BTH:'Bình Thuận', CM:'Cà Mau', CB:'Cao Bằng', DK:'Đắk Lắk', DN2:'Đắk Nông',
+      DB:'Điện Biên', DT:'Đồng Tháp', GL:'Gia Lai', HG:'Hà Giang', HNM:'Hà Nam',
+      HT:'Hà Tĩnh', HB:'Hòa Bình', HU:'Thừa Thiên Huế', HY:'Hưng Yên', KH:'Khánh Hòa',
+      KG:'Kiên Giang', KT:'Kon Tum', LC:'Lai Châu', LD:'Lâm Đồng', LS:'Lạng Sơn',
+      LCU:'Lào Cai', LAN:'Long An', ND:'Nam Định', NA:'Nghệ An', NB:'Ninh Bình',
+      NT:'Ninh Thuận', PT:'Phú Thọ', PY:'Phú Yên', QB:'Quảng Bình', QNM:'Quảng Nam',
+      QNG:'Quảng Ngãi', QNI:'Quảng Ninh', QT:'Quảng Trị', ST:'Sóc Trăng', SL:'Sơn La',
+      TN:'Tây Ninh', TB:'Thái Bình', TNN:'Thái Nguyên', TH:'Thanh Hóa', TV:'Trà Vinh',
+      TQ:'Tuyên Quang', VL:'Vĩnh Long', VP:'Vĩnh Phúc', YB:'Yên Bái', abroad:'Nước ngoài'
+    };
+    const top10 = Object.entries(regionCount).sort((a,b) => b[1]-a[1]).slice(0,10);
+    const maxRegion = top10[0]?.[1] || 1;
+    document.getElementById('stats-region').innerHTML = top10.length ? top10.map(([k, count]) => {
+      const pct = Math.round(count / maxRegion * 100);
+      return `
+        <div style="margin-bottom:.75rem;">
+          <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:.3rem;">
+            <span>${regionLabels[k] || k}</span><span style="font-weight:600;">${count} người</span>
+          </div>
+          <div style="background:rgba(44,40,32,.08);border-radius:99px;height:8px;">
+            <div style="background:var(--teal);width:${pct}%;height:8px;border-radius:99px;"></div>
+          </div>
+        </div>`;
+    }).join('') : '<div style="color:var(--mid);font-size:.85rem;">Chưa có dữ liệu khu vực.</div>';
+
+  } catch(e) {
+    console.log('Stats error:', e.message);
+  }
+}
 
 // ── WORKSHEET FORM CONFIG ─────────────────────────────────
 async function loadWsFormConfig() {
