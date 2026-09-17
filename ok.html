@@ -27,6 +27,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
 
 /* ── PAGES ── */
 .page{display:none;min-height:calc(100vh - 52px);}
+#page-register{width:100%;min-height:calc(100vh - 52px);}
 .page.active{display:block;}
 
 /* ══════════════════════════════
@@ -251,6 +252,129 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
       </div>
       <div class="auth-msg" id="login-msg"></div>
       <button class="btn-full" onclick="doLogin()">Đăng nhập</button>
+      <div style="text-align:center;margin-top:1rem;font-size:.85rem;color:var(--mid);">
+        Chưa có tài khoản? <a href="#" onclick="showRegister()" style="color:var(--teal);font-weight:500;">Đăng ký ngay</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PAGE: REGISTER ═══════════════ -->
+<div class="page" id="page-register">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-headline">Đăng ký tài khoản</div>
+      <div class="auth-sub">Tạo tài khoản để khám phá các worksheet định vị sự nghiệp.</div>
+      <div class="field">
+        <label>Họ và tên <span style="color:var(--rust)">*</span></label>
+        <input type="text" id="reg-name" placeholder="Nguyễn Văn A">
+      </div>
+      <div class="field">
+        <label>Email <span style="color:var(--rust)">*</span></label>
+        <input type="email" id="reg-email" placeholder="email@example.com">
+      </div>
+      <div class="field">
+        <label>Tên đăng nhập <span style="color:var(--rust)">*</span></label>
+        <input type="text" id="reg-username" placeholder="username">
+      </div>
+      <div class="field">
+        <label>Mật khẩu <span style="color:var(--rust)">*</span></label>
+        <div class="pw-wrap">
+          <input type="password" id="reg-password" placeholder="Tối thiểu 8 ký tự">
+          <button class="pw-toggle" onclick="togglePwVisibility('reg-password', this)" tabindex="-1">👁</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Độ tuổi <span style="color:var(--rust)">*</span></label>
+        <select id="reg-age" style="width:100%;padding:.55rem .8rem;border:1px solid rgba(44,40,32,.15);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;background:var(--cream);color:var(--dark);outline:none;">
+          <option value="">-- Chọn độ tuổi --</option>
+          <option value="under18">Dưới 18</option>
+          <option value="18-22">18 - 22</option>
+          <option value="23-27">23 - 27</option>
+          <option value="28-35">28 - 35</option>
+          <option value="36+">36+</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Giới tính <span style="color:var(--rust)">*</span></label>
+        <select id="reg-gender" style="width:100%;padding:.55rem .8rem;border:1px solid rgba(44,40,32,.15);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;background:var(--cream);color:var(--dark);outline:none;">
+          <option value="">-- Chọn giới tính --</option>
+          <option value="male">Nam</option>
+          <option value="female">Nữ</option>
+          <option value="other">Không muốn trả lời</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Khu vực sống <span style="color:var(--rust)">*</span></label>
+        <select id="reg-region" style="width:100%;padding:.55rem .8rem;border:1px solid rgba(44,40,32,.15);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;background:var(--cream);color:var(--dark);outline:none;">
+          <option value="">-- Chọn tỉnh/thành --</option>
+          <option value="HN">Hà Nội</option>
+          <option value="HCM">TP. Hồ Chí Minh</option>
+          <option value="DN">Đà Nẵng</option>
+          <option value="HP">Hải Phòng</option>
+          <option value="CT">Cần Thơ</option>
+          <option value="AG">An Giang</option>
+          <option value="BRV">Bà Rịa - Vũng Tàu</option>
+          <option value="BG">Bắc Giang</option>
+          <option value="BK">Bắc Kạn</option>
+          <option value="BL">Bạc Liêu</option>
+          <option value="BN">Bắc Ninh</option>
+          <option value="BT">Bến Tre</option>
+          <option value="BD">Bình Định</option>
+          <option value="BDU">Bình Dương</option>
+          <option value="BP">Bình Phước</option>
+          <option value="BTH">Bình Thuận</option>
+          <option value="CM">Cà Mau</option>
+          <option value="CB">Cao Bằng</option>
+          <option value="DK">Đắk Lắk</option>
+          <option value="DN2">Đắk Nông</option>
+          <option value="DB">Điện Biên</option>
+          <option value="DT">Đồng Tháp</option>
+          <option value="GL">Gia Lai</option>
+          <option value="HG">Hà Giang</option>
+          <option value="HNM">Hà Nam</option>
+          <option value="HT">Hà Tĩnh</option>
+          <option value="HB">Hòa Bình</option>
+          <option value="HU">Thừa Thiên Huế</option>
+          <option value="HY">Hưng Yên</option>
+          <option value="KH">Khánh Hòa</option>
+          <option value="KG">Kiên Giang</option>
+          <option value="KT">Kon Tum</option>
+          <option value="LC">Lai Châu</option>
+          <option value="LD">Lâm Đồng</option>
+          <option value="LS">Lạng Sơn</option>
+          <option value="LCU">Lào Cai</option>
+          <option value="LAN">Long An</option>
+          <option value="ND">Nam Định</option>
+          <option value="NA">Nghệ An</option>
+          <option value="NB">Ninh Bình</option>
+          <option value="NT">Ninh Thuận</option>
+          <option value="PT">Phú Thọ</option>
+          <option value="PY">Phú Yên</option>
+          <option value="QB">Quảng Bình</option>
+          <option value="QNM">Quảng Nam</option>
+          <option value="QNG">Quảng Ngãi</option>
+          <option value="QNI">Quảng Ninh</option>
+          <option value="QT">Quảng Trị</option>
+          <option value="ST">Sóc Trăng</option>
+          <option value="SL">Sơn La</option>
+          <option value="TN">Tây Ninh</option>
+          <option value="TB">Thái Bình</option>
+          <option value="TNN">Thái Nguyên</option>
+          <option value="TH">Thanh Hóa</option>
+          <option value="TV">Trà Vinh</option>
+          <option value="TQ">Tuyên Quang</option>
+          <option value="VL">Vĩnh Long</option>
+          <option value="VP">Vĩnh Phúc</option>
+          <option value="YB">Yên Bái</option>
+          <option value="abroad">Nước ngoài</option>
+        </select>
+      </div>
+      <div class="auth-msg" id="register-msg"></div>
+      <button class="btn-full" onclick="doRegister()">Tạo tài khoản</button>
+      <div style="text-align:center;margin-top:1rem;font-size:.85rem;color:var(--mid);">
+        Đã có tài khoản? <a href="#" onclick="showLogin()" style="color:var(--teal);font-weight:500;">Đăng nhập</a>
+      </div>
     </div>
   </div>
 </div>
@@ -448,6 +572,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
       #hm-wrapper .hm-btn-primary:hover{background:#335C7A;}
       #hm-incomplete-modal{display:none;position:fixed;inset:0;background:rgba(26,26,46,.45);z-index:300;align-items:center;justify-content:center;padding:24px;}
       #hm-incomplete-modal.show{display:flex;}
+      #hm-verify-choice-modal.show{display:flex!important;}
       #hm-wrapper .hm-modal-box{background:#fff;border-radius:var(--hm-radius);padding:28px;max-width:480px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.12);}
       #hm-wrapper .hm-modal-title{font-size:16px;font-weight:700;color:var(--hm-ink);margin-bottom:6px;}
       #hm-wrapper .hm-modal-sub{font-size:13px;color:var(--hm-ink-light);margin-bottom:20px;line-height:1.5;}
@@ -560,6 +685,22 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);c
           <div class="hm-modal-sub">Bấm vào từng câu để quay lại điền.</div>
           <div class="hm-incomplete-list" id="hm-incomplete-list"></div>
           <button class="hm-modal-close" onclick="hmCloseModal()">Đóng</button>
+        </div>
+      </div>
+
+      <div id="hm-verify-choice-modal" style="display:none;position:fixed;inset:0;background:rgba(26,26,46,.45);z-index:300;align-items:center;justify-content:center;padding:24px;">
+        <div class="hm-modal-box" style="max-width:420px;text-align:center;">
+          <div style="font-size:1.75rem;margin-bottom:.75rem;">💡</div>
+          <div class="hm-modal-title">Bạn chưa điền câu hỏi xác minh</div>
+          <div class="hm-modal-sub" style="margin-bottom:1.25rem;">Câu hỏi xác minh giúp AI hiểu bạn sâu hơn và cho kết quả chuẩn hơn. Bạn muốn làm gì?</div>
+          <div style="display:flex;flex-direction:column;gap:.75rem;">
+            <button class="hm-btn hm-btn-primary" onclick="hmCloseVerifyChoiceModal()" style="width:100%;">
+              ✍️ Điền câu hỏi xác minh — kết quả chuẩn hơn
+            </button>
+            <button class="hm-btn hm-btn-ghost" onclick="hmSkipVerify()" style="width:100%;">
+              ⚡ Xem kết quả luôn
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1262,14 +1403,36 @@ function hmIsComplete(idx) {
 
 window.hmGoNext = function() {
   if (hmCurrent === HM_QUESTIONS.length - 1) {
-    const incomplete = HM_QUESTIONS.map((q,i) => ({i,q})).filter(({i}) => !hmIsComplete(i));
-    if (incomplete.length > 0) { hmShowIncompleteModal(incomplete); return; }
+    // Kiểm tra câu chưa chọn A/B
+    const noChoice = HM_QUESTIONS.map((q,i) => ({i,q})).filter(({i}) => !hmAnswers[i]?.choice);
+    if (noChoice.length > 0) { hmShowIncompleteModal(noChoice); return; }
+
+    // Kiểm tra câu chưa điền xác minh
+    const noVerify = HM_QUESTIONS.map((q,i) => ({i,q})).filter(({i}) => {
+      const a = hmAnswers[i];
+      return !a?.verify?.some(v => v.trim().length > 0);
+    });
+    if (noVerify.length > 0) { hmShowVerifyChoiceModal(); return; }
+
     hmShowResult();
   } else { hmCurrent++; hmShowQuestion(hmCurrent); }
 };
 
 window.hmGoBack = function() {
   if (hmCurrent > 0) { hmCurrent--; hmShowQuestion(hmCurrent); }
+};
+
+function hmShowVerifyChoiceModal() {
+  document.getElementById('hm-verify-choice-modal').classList.add('show');
+}
+
+window.hmCloseVerifyChoiceModal = function() {
+  document.getElementById('hm-verify-choice-modal').classList.remove('show');
+};
+
+window.hmSkipVerify = function() {
+  hmCloseVerifyChoiceModal();
+  hmShowResult();
 };
 
 function hmShowIncompleteModal(incomplete) {
@@ -1389,6 +1552,15 @@ window.hmCallAI = async function() {
   const contentEl = document.getElementById('hm-ai-content');
   const errorEl = document.getElementById('hm-ai-error');
   loadEl.style.display = 'block'; contentEl.style.display = 'none'; errorEl.style.display = 'none';
+
+  // Kiểm tra đủ 30 câu chưa
+  const answeredCount = Object.keys(hmAnswers).filter(k => hmAnswers[k]?.choice).length;
+  if (answeredCount < 30) {
+    loadEl.style.display = 'none';
+    errorEl.style.display = 'block';
+    errorEl.innerHTML = `<p>⚠️ Bạn chưa trả lời đủ 30 câu (đã trả lời ${answeredCount}/30). Vui lòng hoàn thành worksheet trước.</p>`;
+    return;
+  }
 
   const lines = HM_QUESTIONS.map((q, i) => {
     const a = hmAnswers[i]; const ch = a?.choice || '?';
@@ -1752,7 +1924,7 @@ window.switchAdminTab = function(tab) {
 // Apps Script Ver3 endpoint - điền URL sau khi deploy
 const SCRIPT_V3_URL = 'https://tiahere-ai-proxy.thutrang-vhh.workers.dev';
 const SCRIPT_SECRET = 'tia_1988_OJ2nj1di';
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-M8FVxvdd4QEXgSw8fo9GH9cYg14C6CBkUKKxvu7DKK9layzZz9xn3dulFaH8dQZW/exec';  // dùng cho createUser, resetPassword
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyTSOPqbVkQwQPC0amL7uP93KaQc5B3w7D-15y0wAzFuDa6ME9OpPHl9aJj4KosHFOk/exec';  // dùng cho createUser, resetPassword
 const EMAIL_SCRIPT_URL = APPS_SCRIPT_URL;  // alias - dùng cho sendWelcomeEmail
 
 // Generate mật khẩu ngẫu nhiên
@@ -1940,6 +2112,98 @@ window.toggleUserActive = async function(uid, currentlyActive) {
   loadAdminData();
 };
 
+// ── REGISTER ─────────────────────────────────────────────
+window.showRegister = function() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-register').classList.add('active');
+  history.replaceState(null, '', '#register');
+};
+
+window.showLogin = function() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-login').classList.add('active');
+  history.replaceState(null, '', '#');
+};
+
+window.doRegister = async function() {
+  const displayName = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const username = document.getElementById('reg-username').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const age = document.getElementById('reg-age').value;
+  const gender = document.getElementById('reg-gender').value;
+  const region = document.getElementById('reg-region').value;
+  const msg = document.getElementById('register-msg');
+  msg.className = 'msg'; msg.style.display = 'none';
+
+  // Validate
+  if (!displayName || !email || !username || !password || !age || !gender || !region) {
+    return showMsg(msg, 'err', 'Vui lòng điền đầy đủ tất cả các trường.');
+  }
+  if (password.length < 8) {
+    return showMsg(msg, 'err', 'Mật khẩu tối thiểu 8 ký tự.');
+  }
+
+  try {
+    showMsg(msg, 'ok', '⏳ Đang tạo tài khoản...');
+
+    // Gọi Apps Script tạo user
+    const params = new URLSearchParams({
+      secret: SCRIPT_SECRET,
+      action: 'createUser',
+      displayName, email, username, password,
+      worksheets: '',
+      accessType: 'none',
+      age, gender, region,
+      selfRegister: 'true'
+    });
+
+    const resp = await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`);
+    const result = await resp.json();
+
+    if (!result.success) {
+      return showMsg(msg, 'err', 'Lỗi: ' + result.error);
+    }
+
+    // Lưu thêm thông tin vào Firestore
+    const uid = result.uid;
+    await updateDoc(doc(db, 'users_v3', uid), {
+      age, gender, region,
+      selfRegistered: true,
+      registeredAt: new Date().toISOString()
+    });
+
+    // Gửi email xác nhận
+    const emailParams = new URLSearchParams({
+      secret: SCRIPT_SECRET,
+      action: 'sendConfirmEmail',
+      displayName, email
+    });
+    fetch(`${APPS_SCRIPT_URL}?${emailParams.toString()}`).catch(() => {});
+
+    showMsg(msg, 'ok', '✅ Tạo tài khoản thành công! Đang đăng nhập...');
+
+    // Đăng nhập luôn
+    setTimeout(async () => {
+      try {
+        const q = query(collection(db, 'users_v3'), where('username', '==', username));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          const userEmail = snap.docs[0].data().email;
+          const { signInWithEmailAndPassword } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+          await signInWithEmailAndPassword(auth, userEmail, password);
+        }
+      } catch(e) {
+        showMsg(msg, 'ok', '✅ Tài khoản đã tạo! Vui lòng đăng nhập.');
+        showLogin();
+      }
+    }, 1500);
+
+  } catch(e) {
+    showMsg(msg, 'err', 'Lỗi kết nối: ' + e.message);
+  }
+};
+
 // ── FORGOT PASSWORD ─────────────────────────────────────
 window.showBuyModal = async function(wsId) {
   const modal = document.getElementById('modal-buy');
@@ -2092,7 +2356,12 @@ window.saveWsFormConfig = async function() {
 function handleRoute(user) {
   const hash = window.location.hash;
   if (!user) {
-    showPage('login');
+    if (hash === '#register') {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-register').classList.add('active');
+    } else {
+      showPage('login');
+    }
     return;
   }
   const isAdmin = currentUserData && currentUserData.username === ADMIN_USERNAME;
