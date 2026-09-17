@@ -2165,14 +2165,6 @@ window.doRegister = async function() {
       return showMsg(msg, 'err', 'Lỗi: ' + result.error);
     }
 
-    // Lưu thêm thông tin vào Firestore
-    const uid = result.uid;
-    await updateDoc(doc(db, 'users_v3', uid), {
-      age, gender, region,
-      selfRegistered: true,
-      registeredAt: new Date().toISOString()
-    });
-
     // Gửi email xác nhận
     const emailParams = new URLSearchParams({
       secret: SCRIPT_SECRET,
@@ -2189,9 +2181,16 @@ window.doRegister = async function() {
         const q = query(collection(db, 'users_v3'), where('username', '==', username));
         const snap = await getDocs(q);
         if (!snap.empty) {
-          const userEmail = snap.docs[0].data().email;
+          const userDoc = snap.docs[0];
+          const userEmail = userDoc.data().email;
           const { signInWithEmailAndPassword } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-          await signInWithEmailAndPassword(auth, userEmail, password);
+          const cred = await signInWithEmailAndPassword(auth, userEmail, password);
+          // Lưu age/gender/region sau khi đã đăng nhập
+          await updateDoc(doc(db, 'users_v3', cred.user.uid), {
+            age, gender, region,
+            selfRegistered: true,
+            registeredAt: new Date().toISOString()
+          });
         }
       } catch(e) {
         showMsg(msg, 'ok', '✅ Tài khoản đã tạo! Vui lòng đăng nhập.');
